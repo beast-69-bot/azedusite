@@ -41,6 +41,8 @@
     .gate-card h2{margin:0 0 8px}
     .gate-error{display:none;margin-top:10px;color:#a61c1c;font-size:.9rem}
     .gate-note{margin-top:10px;color:var(--muted);font-size:.85rem}
+    .password-wrap{position:relative}
+    .toggle-pass{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:1px solid var(--line);background:#fff;color:#24456b;border-radius:8px;padding:5px 9px;font-size:.78rem;font-weight:700;cursor:pointer}
     @media (max-width:980px){.grid-3{grid-template-columns:1fr}}
   </style>
 </head>
@@ -64,7 +66,10 @@
       <p>Enter admin passcode to access content management.</p>
       <form id="gateForm">
         <label>Passcode</label>
-        <input type="password" id="gatePassword" required />
+        <div class="password-wrap">
+          <input type="password" id="gatePassword" required />
+          <button type="button" class="toggle-pass" id="togglePass">Show</button>
+        </div>
         <div class="btn-row"><button class="btn btn-primary" id="unlockBtn" type="button">Unlock Admin</button></div>
       </form>
       <p id="gateError" class="gate-error">Invalid passcode.</p>
@@ -194,7 +199,7 @@
   </div>
 
   <script>
-    const ADMIN_PASSWORD = "studypro@admin2026";
+    const ADMIN_PASSWORD = "Anshu@A2025#FI";
     const SESSION_KEY = "studypro_admin_session_until";
     const SESSION_MS = 30 * 60 * 1000;
 
@@ -204,6 +209,7 @@
     const gatePassword = document.getElementById("gatePassword");
     const gateError = document.getElementById("gateError");
     const unlockBtn = document.getElementById("unlockBtn");
+    const togglePass = document.getElementById("togglePass");
     let initialized = false;
 
     function isSessionValid() {
@@ -249,6 +255,13 @@
         e.preventDefault();
         attemptUnlock();
       }
+    });
+
+    togglePass.addEventListener("click", () => {
+      const visible = gatePassword.type === "text";
+      gatePassword.type = visible ? "password" : "text";
+      togglePass.textContent = visible ? "Show" : "Hide";
+      gatePassword.focus();
     });
 
     if (isSessionValid()) {

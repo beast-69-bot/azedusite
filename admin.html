@@ -35,6 +35,12 @@
     .empty{color:var(--muted);font-size:.92rem}
     .footer{margin-top:28px;padding:30px 0 20px;background:#0e1d38;color:#c8d7f4}
     .copy{font-size:.85rem;color:#9eb3db}
+    .hidden{display:none}
+    .gate-wrap{min-height:calc(100vh - 72px);display:grid;place-items:center;padding:24px}
+    .gate-card{width:min(460px,100%);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+    .gate-card h2{margin:0 0 8px}
+    .gate-error{display:none;margin-top:10px;color:#a61c1c;font-size:.9rem}
+    .gate-note{margin-top:10px;color:var(--muted);font-size:.85rem}
     @media (max-width:980px){.grid-3{grid-template-columns:1fr}}
   </style>
 </head>
@@ -52,6 +58,21 @@
     </div>
   </header>
 
+  <div id="loginGate" class="gate-wrap">
+    <div class="gate-card">
+      <h2>Admin Access</h2>
+      <p>Enter admin passcode to access content management.</p>
+      <form id="gateForm">
+        <label>Passcode</label>
+        <input type="password" id="gatePassword" required />
+        <div class="btn-row"><button class="btn btn-primary" type="submit">Unlock Admin</button></div>
+      </form>
+      <p id="gateError" class="gate-error">Invalid passcode.</p>
+      <p class="gate-note">Client-side protection only. For strong security, use backend authentication.</p>
+    </div>
+  </div>
+
+  <div id="adminContent" class="hidden">
   <section class="hero">
     <div class="container">
       <h1>Admin Content Manager</h1>
@@ -170,131 +191,187 @@
       <div class="copy">&copy; <span id="year"></span> StudyPro Academy. All rights reserved.</div>
     </div>
   </footer>
+  </div>
 
   <script>
-    const KEYS = {
-      courses: "studypro_admin_courses",
-      books: "studypro_admin_books",
-      pyqs: "studypro_admin_pyqs"
-    };
+    const ADMIN_PASSWORD_HASH = "7952454cd9f1895d55133b782eed1746e1a609bb538c275832c29dfe63ada2b2";
+    const SESSION_KEY = "studypro_admin_session_until";
+    const SESSION_MS = 30 * 60 * 1000;
 
-    const getData = (key) => JSON.parse(localStorage.getItem(key) || "[]");
-    const setData = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+    const loginGate = document.getElementById("loginGate");
+    const adminContent = document.getElementById("adminContent");
+    const gateForm = document.getElementById("gateForm");
+    const gatePassword = document.getElementById("gatePassword");
+    const gateError = document.getElementById("gateError");
+    let initialized = false;
 
-    function removeItem(key, index) {
-      const data = getData(key);
-      data.splice(index, 1);
-      setData(key, data);
+    async function sha256(input) {
+      const enc = new TextEncoder().encode(input);
+      const buff = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buff)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function isSessionValid() {
+      const until = Number(sessionStorage.getItem(SESSION_KEY) || 0);
+      return until && Date.now() < until;
+    }
+
+    function unlockAdmin() {
+      loginGate.classList.add("hidden");
+      adminContent.classList.remove("hidden");
+      if (!initialized) {
+        initAdminPanel();
+        initialized = true;
+      }
+    }
+
+    gateForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      gateError.style.display = "none";
+      const pass = gatePassword.value;
+      const hash = await sha256(pass);
+      if (hash === ADMIN_PASSWORD_HASH) {
+        sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
+        unlockAdmin();
+        return;
+      }
+      gateError.style.display = "block";
+      gateForm.reset();
+      gatePassword.focus();
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1200);
+    });
+
+    if (isSessionValid()) {
+      unlockAdmin();
+    }
+
+    function initAdminPanel() {
+      const KEYS = {
+        courses: "studypro_admin_courses",
+        books: "studypro_admin_books",
+        pyqs: "studypro_admin_pyqs"
+      };
+
+      const getData = (key) => JSON.parse(localStorage.getItem(key) || "[]");
+      const setData = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+
+      function removeItem(key, index) {
+        const data = getData(key);
+        data.splice(index, 1);
+        setData(key, data);
+        renderAll();
+      }
+
+      function renderCourses() {
+        const data = getData(KEYS.courses);
+        const tbody = document.querySelector("#coursesTable tbody");
+        const empty = document.getElementById("coursesEmpty");
+        tbody.innerHTML = "";
+        empty.style.display = data.length ? "none" : "block";
+        data.forEach((item, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${item.name}</td><td>${item.stream}</td><td>${item.duration}</td><td>INR ${item.price}</td><td><button class="btn btn-danger" data-key="courses" data-index="${index}">Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderBooks() {
+        const data = getData(KEYS.books);
+        const tbody = document.querySelector("#booksTable tbody");
+        const empty = document.getElementById("booksEmpty");
+        tbody.innerHTML = "";
+        empty.style.display = data.length ? "none" : "block";
+        data.forEach((item, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${item.title}</td><td>${item.category}</td><td>${item.description}</td><td><button class="btn btn-danger" data-key="books" data-index="${index}">Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderPyqs() {
+        const data = getData(KEYS.pyqs);
+        const tbody = document.querySelector("#pyqsTable tbody");
+        const empty = document.getElementById("pyqsEmpty");
+        tbody.innerHTML = "";
+        empty.style.display = data.length ? "none" : "block";
+        data.forEach((item, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${item.exam}</td><td>${item.year}</td><td>${item.subject}</td><td>${item.topic}</td><td><button class="btn btn-danger" data-key="pyqs" data-index="${index}">Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderAll() {
+        renderCourses();
+        renderBooks();
+        renderPyqs();
+      }
+
+      document.getElementById("courseForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = getData(KEYS.courses);
+        data.push({
+          name: document.getElementById("courseName").value.trim(),
+          stream: document.getElementById("courseStream").value,
+          duration: document.getElementById("courseDuration").value.trim(),
+          price: document.getElementById("coursePrice").value
+        });
+        setData(KEYS.courses, data);
+        e.target.reset();
+        renderCourses();
+      });
+
+      document.getElementById("bookForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = getData(KEYS.books);
+        data.push({
+          title: document.getElementById("bookTitle").value.trim(),
+          category: document.getElementById("bookCategory").value,
+          description: document.getElementById("bookDesc").value.trim()
+        });
+        setData(KEYS.books, data);
+        e.target.reset();
+        renderBooks();
+      });
+
+      document.getElementById("pyqForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = getData(KEYS.pyqs);
+        data.push({
+          exam: document.getElementById("pyqExam").value,
+          year: document.getElementById("pyqYear").value,
+          subject: document.getElementById("pyqSubject").value.trim(),
+          topic: document.getElementById("pyqTopic").value.trim()
+        });
+        setData(KEYS.pyqs, data);
+        e.target.reset();
+        renderPyqs();
+      });
+
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-key]");
+        if (!btn) return;
+        const key = btn.getAttribute("data-key");
+        const index = Number(btn.getAttribute("data-index"));
+        if (key === "courses") removeItem(KEYS.courses, index);
+        if (key === "books") removeItem(KEYS.books, index);
+        if (key === "pyqs") removeItem(KEYS.pyqs, index);
+      });
+
+      document.getElementById("clearAllBtn").addEventListener("click", () => {
+        const ok = confirm("Clear all admin data for courses, books, and PYQs?");
+        if (!ok) return;
+        localStorage.removeItem(KEYS.courses);
+        localStorage.removeItem(KEYS.books);
+        localStorage.removeItem(KEYS.pyqs);
+        renderAll();
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
       renderAll();
     }
-
-    function renderCourses() {
-      const data = getData(KEYS.courses);
-      const tbody = document.querySelector("#coursesTable tbody");
-      const empty = document.getElementById("coursesEmpty");
-      tbody.innerHTML = "";
-      empty.style.display = data.length ? "none" : "block";
-      data.forEach((item, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${item.name}</td><td>${item.stream}</td><td>${item.duration}</td><td>INR ${item.price}</td><td><button class="btn btn-danger" data-key="courses" data-index="${index}">Delete</button></td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderBooks() {
-      const data = getData(KEYS.books);
-      const tbody = document.querySelector("#booksTable tbody");
-      const empty = document.getElementById("booksEmpty");
-      tbody.innerHTML = "";
-      empty.style.display = data.length ? "none" : "block";
-      data.forEach((item, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${item.title}</td><td>${item.category}</td><td>${item.description}</td><td><button class="btn btn-danger" data-key="books" data-index="${index}">Delete</button></td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderPyqs() {
-      const data = getData(KEYS.pyqs);
-      const tbody = document.querySelector("#pyqsTable tbody");
-      const empty = document.getElementById("pyqsEmpty");
-      tbody.innerHTML = "";
-      empty.style.display = data.length ? "none" : "block";
-      data.forEach((item, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${item.exam}</td><td>${item.year}</td><td>${item.subject}</td><td>${item.topic}</td><td><button class="btn btn-danger" data-key="pyqs" data-index="${index}">Delete</button></td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderAll() {
-      renderCourses();
-      renderBooks();
-      renderPyqs();
-    }
-
-    document.getElementById("courseForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = getData(KEYS.courses);
-      data.push({
-        name: document.getElementById("courseName").value.trim(),
-        stream: document.getElementById("courseStream").value,
-        duration: document.getElementById("courseDuration").value.trim(),
-        price: document.getElementById("coursePrice").value
-      });
-      setData(KEYS.courses, data);
-      e.target.reset();
-      renderCourses();
-    });
-
-    document.getElementById("bookForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = getData(KEYS.books);
-      data.push({
-        title: document.getElementById("bookTitle").value.trim(),
-        category: document.getElementById("bookCategory").value,
-        description: document.getElementById("bookDesc").value.trim()
-      });
-      setData(KEYS.books, data);
-      e.target.reset();
-      renderBooks();
-    });
-
-    document.getElementById("pyqForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = getData(KEYS.pyqs);
-      data.push({
-        exam: document.getElementById("pyqExam").value,
-        year: document.getElementById("pyqYear").value,
-        subject: document.getElementById("pyqSubject").value.trim(),
-        topic: document.getElementById("pyqTopic").value.trim()
-      });
-      setData(KEYS.pyqs, data);
-      e.target.reset();
-      renderPyqs();
-    });
-
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-key]");
-      if (!btn) return;
-      const key = btn.getAttribute("data-key");
-      const index = Number(btn.getAttribute("data-index"));
-      if (key === "courses") removeItem(KEYS.courses, index);
-      if (key === "books") removeItem(KEYS.books, index);
-      if (key === "pyqs") removeItem(KEYS.pyqs, index);
-    });
-
-    document.getElementById("clearAllBtn").addEventListener("click", () => {
-      const ok = confirm("Clear all admin data for courses, books, and PYQs?");
-      if (!ok) return;
-      localStorage.removeItem(KEYS.courses);
-      localStorage.removeItem(KEYS.books);
-      localStorage.removeItem(KEYS.pyqs);
-      renderAll();
-    });
-
-    document.getElementById("year").textContent = new Date().getFullYear();
-    renderAll();
   </script>
 </body>
 </html>

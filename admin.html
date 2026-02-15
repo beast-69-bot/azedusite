@@ -65,14 +65,14 @@
     <div class="gate-card">
       <h2>Admin Access</h2>
       <p>Enter admin passcode to access content management.</p>
-      <form id="gateForm">
+      <form id="gateForm" onsubmit="return false;">
         <label>Passcode</label>
         <div class="password-wrap">
           <input type="password" id="gatePassword" required />
           <button type="button" class="toggle-pass" id="togglePass">Show</button>
         </div>
         <p class="pass-tip">Case-sensitive. Make sure `#` is included.</p>
-        <div class="btn-row"><button class="btn btn-primary" id="unlockBtn" type="button">Unlock Admin</button></div>
+        <div class="btn-row"><button class="btn btn-primary" id="unlockBtn" type="button" onclick="window.__studyproUnlock && window.__studyproUnlock()">Unlock Admin</button></div>
       </form>
       <p id="gateError" class="gate-error">Invalid passcode.</p>
       <p class="gate-note">Client-side protection only. For strong security, use backend authentication.</p>
@@ -215,8 +215,24 @@
     const togglePass = document.getElementById("togglePass");
     let initialized = false;
 
+    function getSessionUntil() {
+      try {
+        return Number(sessionStorage.getItem(SESSION_KEY) || 0);
+      } catch (_) {
+        return Number(window.__studyproSessionUntil || 0);
+      }
+    }
+
+    function setSessionUntil(until) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, String(until));
+      } catch (_) {
+        window.__studyproSessionUntil = until;
+      }
+    }
+
     function isSessionValid() {
-      const until = Number(sessionStorage.getItem(SESSION_KEY) || 0);
+      const until = getSessionUntil();
       return until && Date.now() < until;
     }
 
@@ -232,7 +248,8 @@
     function attemptUnlock() {
       gateError.style.display = "none";
       const pass = gatePassword.value.trim();
-      const normalized = pass.normalize("NFKC");
+      const cleaned = pass.replace(/[\u200B-\u200D\uFEFF]/g, "");
+      const normalized = cleaned.normalize("NFKC");
       const normalizedLower = normalized.toLowerCase();
 
       if (
@@ -241,7 +258,7 @@
         normalizedLower === ADMIN_PASSWORD.toLowerCase() ||
         normalizedLower === "anshu@a2025#fl"
       ) {
-        sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
+        setSessionUntil(Date.now() + SESSION_MS);
         unlockAdmin();
         return true;
       }
@@ -273,6 +290,8 @@
       togglePass.textContent = visible ? "Show" : "Hide";
       gatePassword.focus();
     });
+
+    window.__studyproUnlock = attemptUnlock;
 
     if (isSessionValid()) {
       unlockAdmin();

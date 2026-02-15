@@ -6,46 +6,25 @@
   <title>StudyPro Academy | Mock Tests</title>
   <style>
     :root{--bg:#f4f7fb;--surface:#fff;--text:#142033;--muted:#5d6b82;--primary:#0f5bd8;--line:#e4ebf5;--radius:16px;--shadow:0 14px 28px rgba(15,31,58,.08)}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}
-    body{margin:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-    .container{width:min(1120px,92%);margin:0 auto}
-    .navbar{position:sticky;top:0;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-    .nav-wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{text-decoration:none;color:var(--text)}.brand strong{display:block}.brand span{font-size:.78rem;color:var(--muted)}
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    .container{width:min(1120px,92%);margin:0 auto}.navbar{position:sticky;top:0;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .nav-wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{text-decoration:none;color:var(--text)}.brand strong{display:block}.brand span{font-size:.78rem;color:var(--muted)}
     .menu-toggle{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px}
     .nav-links{list-style:none;display:flex;gap:8px;margin:0;padding:0}.nav-links a{text-decoration:none;color:#1e2c41;font-weight:600;font-size:.94rem;padding:8px 11px;border-radius:10px}
     .nav-links a:hover,.nav-links a.active{background:#e9f0ff;color:var(--primary)}
     .hero{padding:80px 0;color:#f2f7ff;background:radial-gradient(circle at 10% 10%,#194392 0,transparent 42%),linear-gradient(135deg,#0a1630,#102c5f)}
     .eyebrow{display:inline-block;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-size:.76rem;text-transform:uppercase}
     .hero h1{margin:12px 0 10px;font-size:clamp(1.8rem,4vw,2.6rem)}.hero p{margin:0;color:#d4def2;max-width:760px}
-    .hero-points{margin-top:12px;padding-left:18px;color:#dbe5fa}
     section{padding:62px 0}.section-title{margin:0 0 8px;font-size:clamp(1.3rem,2.1vw,1.9rem)}.section-sub{margin:0 0 22px;color:var(--muted)}
     .grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
     .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
     .chip{display:inline-flex;padding:4px 10px;border-radius:999px;background:#eaf1ff;color:var(--primary);font-size:.78rem;font-weight:700}
-    .mock-card{position:relative;overflow:hidden}
-    .mock-card h3{margin:8px 0 6px}.mock-card p{margin:0;color:var(--muted)}
-    .lock-tag{position:absolute;right:14px;top:14px;font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#ffe7e7;color:#9a1f1f;border:1px solid #ffcccc}
-    .btn{display:inline-block;border-radius:12px;padding:9px 14px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-muted{background:#e6edf7;color:#31517a}
-    .actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
-    .plan{border:1px solid #d8e3f8;background:#f8fbff}
-    .plan h3{margin:0 0 6px}.price{font-size:1.35rem;font-weight:800;color:#102a52}
-    .plan small{color:#4f6787}
-    .plan.active{border-color:#8ab4ff;background:#eef5ff}
-    .access-status{margin-top:10px;font-size:.92rem;color:#35557f}
-    .highlight{outline:2px solid #a8c7ff;outline-offset:2px;transition:.2s}
-    .footer{margin-top:28px;padding:38px 0 24px;background:#0e1d38;color:#c8d7f4}
-    .footer-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}.footer h4{margin:0 0 8px;color:#f5f8ff}.footer a{text-decoration:none;color:#d6e2ff;font-size:.92rem}
-    .copy{border-top:1px solid rgba(210,225,255,.2);margin-top:12px;padding-top:10px;font-size:.85rem;color:#9eb3db}
-    .unlocked .lock-tag{background:#e8ffef;color:#116a2b;border-color:#c7f5d6}
-    @media (max-width:980px){
-      .grid-2,.grid-3,.footer-grid{grid-template-columns:1fr}
-      .menu-toggle{display:inline-flex}
-      .nav-links{display:none;position:absolute;top:72px;right:4%;width:min(320px,92%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow);flex-direction:column;align-items:flex-start}
-      .nav-links.open{display:flex}
-    }
+    .mock-card{position:relative}.lock-tag{position:absolute;right:14px;top:14px;font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;background:#ffe7e7;color:#9a1f1f;border:1px solid #ffcccc}
+    .btn{display:inline-block;border-radius:12px;padding:9px 14px;font-weight:700;text-decoration:none;border:none;cursor:pointer}.btn-primary{background:var(--primary);color:#fff}.btn-muted{background:#e6edf7;color:#31517a}
+    .actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}.price{font-size:1.3rem;font-weight:800}
+    .footer{margin-top:28px;padding:38px 0 24px;background:#0e1d38;color:#c8d7f4}.footer-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
+    .footer h4{margin:0 0 8px;color:#f5f8ff}.footer a{text-decoration:none;color:#d6e2ff;font-size:.92rem}.copy{border-top:1px solid rgba(210,225,255,.2);margin-top:12px;padding-top:10px;font-size:.85rem;color:#9eb3db}
+    @media (max-width:980px){.grid-2,.grid-3,.footer-grid{grid-template-columns:1fr}.menu-toggle{display:inline-flex}.nav-links{display:none;position:absolute;top:72px;right:4%;width:min(320px,92%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow);flex-direction:column;align-items:flex-start}.nav-links.open{display:flex}}
   </style>
 </head>
 <body>
@@ -54,166 +33,113 @@
       <a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a>
       <button class="menu-toggle" id="menuToggle" type="button">Menu</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="courses.html">Courses</a></li>
-        <li><a href="books.html">Books</a></li>
-        <li><a href="pyqs.html">PYQs</a></li>
-        <li><a class="active" href="mock.html">Mock Tests</a></li>
-        <li><a href="index.html#results">Results</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="index.html">Home</a></li><li><a href="courses.html">Courses</a></li><li><a href="books.html">Books</a></li><li><a href="pyqs.html">PYQs</a></li>
+        <li><a class="active" href="mock.html">Mock Tests</a></li><li><a href="index.html#results">Results</a></li><li><a href="contact.html">Contact</a></li>
+        <li><a id="navLogin" href="login.html">Login</a></li><li><a id="navDashboard" href="dashboard.html" style="display:none">Dashboard</a></li><li><a id="navLogout" href="#" style="display:none">Logout</a></li>
       </ul>
     </div>
   </header>
+  <div id="lockedOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,33,.82);z-index:1200;color:#fff;align-items:center;justify-content:center;text-align:center;padding:20px;">
+    <div style="max-width:520px;background:#0f1b31;border:1px solid #284a7a;border-radius:14px;padding:22px;">
+      <h2 class="locked-title" style="margin:0 0 8px;">Subscription required for mock tests</h2>
+      <p style="margin:0 0 14px;color:#cad8f7;">Single plan unlocks all sections: Courses, Books, PYQs, Mock Tests.</p>
+      <a href="login.html" class="btn btn-primary">Login / Continue</a>
+      <a href="dashboard.html" class="btn btn-muted">View Plans</a>
+    </div>
+  </div>
 
   <section class="hero">
     <div class="container">
       <span class="eyebrow">Premium Locked Mock Portal</span>
       <h1>Mock Tests Built on Most Repeated PYQ Patterns</h1>
-      <p>Our mock sets are structured around high-frequency PYQ trends, repeated concept clusters, and exam-like timing strategy.</p>
-      <ul class="hero-points">
-        <li>Pattern-focused mock engine inspired by repeated PYQ categories</li>
-        <li>All mock tests are locked and available after active plan purchase</li>
-        <li>No guaranteed rank or score outcomes</li>
-      </ul>
+      <p>Choose one plan and access all sections for the selected validity.</p>
     </div>
   </section>
 
   <main>
-    <section id="pricing">
+    <section>
       <div class="container">
-        <h2 class="section-title">Unlock Plans</h2>
-        <p class="section-sub">Choose one plan to unlock all mock sections.</p>
+        <h2 class="section-title">Unlock Plans (All Sections)</h2>
+        <p class="section-sub" id="accessStatus">Status: Login required to verify subscription.</p>
         <div class="grid grid-3">
-          <article class="card plan" data-plan="daily"><h3>Daily Access</h3><div class="price">₹9</div><small>1 day access</small><div class="actions"><button class="btn btn-primary plan-btn" data-plan="daily">Unlock for ₹9</button></div></article>
-          <article class="card plan" data-plan="weekly"><h3>7-Day Access</h3><div class="price">₹29</div><small>7 days access</small><div class="actions"><button class="btn btn-primary plan-btn" data-plan="weekly">Unlock for ₹29</button></div></article>
-          <article class="card plan" data-plan="monthly"><h3>Monthly Access</h3><div class="price">₹99</div><small>30 days access</small><div class="actions"><button class="btn btn-primary plan-btn" data-plan="monthly">Unlock for ₹99</button></div></article>
+          <article class="card"><h3>Daily Access</h3><div class="price">Rs 9</div><p>1 day for Courses + Books + PYQs + Mock Tests</p><div class="actions"><a class="btn btn-primary" href="dashboard.html">Get Plan</a></div></article>
+          <article class="card"><h3>7-Day Access</h3><div class="price">Rs 29</div><p>7 days for Courses + Books + PYQs + Mock Tests</p><div class="actions"><a class="btn btn-primary" href="dashboard.html">Get Plan</a></div></article>
+          <article class="card"><h3>Monthly Access</h3><div class="price">Rs 99</div><p>30 days for Courses + Books + PYQs + Mock Tests</p><div class="actions"><a class="btn btn-primary" href="dashboard.html">Get Plan</a></div></article>
         </div>
-        <p class="access-status" id="accessStatus">Status: Locked. Please select a plan to unlock mock tests.</p>
       </div>
     </section>
 
     <section>
       <div class="container">
-        <h2 class="section-title">Locked Mock Test Sections</h2>
-        <p class="section-sub">All test modules are lock-protected and available with active access plan.</p>
-
-        <h3 style="margin:0 0 10px;">JEE Main Mock Tests</h3>
+        <h2 class="section-title">JEE Main Mock Tests</h2>
         <div class="grid grid-2" style="margin-bottom:22px;">
-          <article class="card mock-card" data-test="jee-main-full"><span class="chip">JEE Main Full-Length</span><span class="lock-tag">Locked</span><h3>JEE Main Repeated PYQ Pattern Simulation</h3><p>Questions: 90 | Duration: 180 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card" data-test="jee-main-topic"><span class="chip">JEE Main Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated JEE Main Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card" data-test="jee-main-coming"><span class="chip">JEE Main</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional JEE Main mock sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">JEE Main Full-Length</span><span class="lock-tag">Locked</span><h3>JEE Main Repeated PYQ Pattern Simulation</h3><p>Questions: 90 | Duration: 180 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">JEE Main Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated JEE Main Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">JEE Main</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional JEE Main sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
         </div>
-
-        <h3 style="margin:0 0 10px;">NEET Mock Tests</h3>
+        <h2 class="section-title">NEET Mock Tests</h2>
         <div class="grid grid-2">
-          <article class="card mock-card" data-test="neet-full"><span class="chip">NEET Full-Length</span><span class="lock-tag">Locked</span><h3>NEET Repeated PYQ Pattern Simulation</h3><p>Questions: 200 | Duration: 200 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card" data-test="neet-topic"><span class="chip">NEET Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated NEET Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card" data-test="neet-coming"><span class="chip">NEET</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional NEET mock sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">NEET Full-Length</span><span class="lock-tag">Locked</span><h3>NEET Repeated PYQ Pattern Simulation</h3><p>Questions: 200 | Duration: 200 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">NEET Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated NEET Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+          <article class="card mock-card"><span class="chip">NEET</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional NEET sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div><h4>StudyPro Academy</h4><p style="margin:0;color:#bbcae8">Subscription-based digital learning service for JEE & NEET preparation.</p></div>
-        <div><h4>Explore</h4><a href="courses.html">Courses</a><br><a href="books.html">Books & Notes</a><br><a href="pyqs.html">PYQs</a><br><a href="mock.html">Mock Tests</a></div>
-        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a><br><a href="refund.html">Refund Policy</a><br><a href="contact.html">Contact</a></div>
-      </div>
-      <div class="copy">&copy; <span id="year"></span> StudyPro Academy. All rights reserved.</div>
-    </div>
-  </footer>
+  <footer class="footer"><div class="container"><div class="footer-grid"><div><h4>StudyPro Academy</h4><p style="margin:0;color:#bbcae8">Subscription-based digital learning service for JEE & NEET preparation.</p></div><div><h4>Explore</h4><a href="courses.html">Courses</a><br><a href="books.html">Books & Notes</a><br><a href="pyqs.html">PYQs</a><br><a href="mock.html">Mock Tests</a></div><div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a><br><a href="refund.html">Refund Policy</a><br><a href="contact.html">Contact</a></div></div><div class="copy">&copy; <span id="year"></span> StudyPro Academy. All rights reserved.</div></div></footer>
 
+  <script src="/assets/app.js"></script>
   <script>
     const menuToggle = document.getElementById("menuToggle");
     const navLinks = document.getElementById("navLinks");
     menuToggle.addEventListener("click", () => navLinks.classList.toggle("open"));
     navLinks.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => navLinks.classList.remove("open")));
-
-    const ACCESS_UNTIL_KEY = "studypro_mock_access_until";
-    const ACCESS_PLAN_KEY = "studypro_mock_access_plan";
     const accessStatus = document.getElementById("accessStatus");
-    const plans = {
-      daily: { label: "Daily", amount: 9, ms: 1 * 24 * 60 * 60 * 1000 },
-      weekly: { label: "7-Day", amount: 29, ms: 7 * 24 * 60 * 60 * 1000 },
-      monthly: { label: "Monthly", amount: 99, ms: 30 * 24 * 60 * 60 * 1000 }
-    };
 
-    const getUntil = () => Number(localStorage.getItem(ACCESS_UNTIL_KEY) || 0);
-    const hasAccess = () => Date.now() < getUntil();
-
-    function formatRemaining(ms) {
-      const totalMinutes = Math.max(0, Math.floor(ms / 60000));
-      const days = Math.floor(totalMinutes / 1440);
-      const hours = Math.floor((totalMinutes % 1440) / 60);
-      const mins = totalMinutes % 60;
-      return `${days}d ${hours}h ${mins}m`;
-    }
-
-    function renderState() {
-      const unlocked = hasAccess();
-      const cards = document.querySelectorAll(".mock-card");
-      cards.forEach((card) => {
-        const tag = card.querySelector(".lock-tag");
-        const btn = card.querySelector(".start-btn");
-        if (unlocked) {
-          card.classList.add("unlocked");
-          tag.textContent = "Unlocked";
-          btn.textContent = "Start Test";
-          btn.classList.remove("btn-muted");
-          btn.classList.add("btn-primary");
-        } else {
-          card.classList.remove("unlocked");
-          tag.textContent = "Locked";
-          btn.textContent = "Locked";
-          btn.classList.remove("btn-primary");
-          btn.classList.add("btn-muted");
-        }
-      });
-
-      document.querySelectorAll(".plan").forEach((p) => p.classList.remove("active"));
-      if (unlocked) {
-        const until = getUntil();
-        const plan = localStorage.getItem(ACCESS_PLAN_KEY) || "Active";
-        accessStatus.textContent = `Status: Unlocked (${plan} plan). Remaining access: ${formatRemaining(until - Date.now())}`;
-        const activeCard = document.querySelector(`.plan[data-plan="${plan.toLowerCase()}"]`);
-        if (activeCard) activeCard.classList.add("active");
-      } else {
-        accessStatus.textContent = "Status: Locked. Please select a plan to unlock mock tests.";
+    async function applyServerAccess() {
+      try {
+        const r = await studypro.api("/api/access/mock");
+        const unlocked = r.allowed;
+        document.querySelectorAll(".mock-card").forEach((card) => {
+          const tag = card.querySelector(".lock-tag");
+          const btn = card.querySelector(".start-btn");
+          if (unlocked) {
+            tag.textContent = "Unlocked";
+            btn.textContent = "Start Test";
+            btn.classList.remove("btn-muted");
+            btn.classList.add("btn-primary");
+          } else {
+            tag.textContent = "Locked";
+            btn.textContent = "Locked";
+            btn.classList.remove("btn-primary");
+            btn.classList.add("btn-muted");
+          }
+        });
+        accessStatus.textContent = unlocked
+          ? `Status: Unlocked by ${r.subscription.plan_key} plan until ${new Date(r.subscription.ends_at).toLocaleString()}`
+          : "Status: Locked. Buy one plan from dashboard.";
+      } catch (_) {
+        accessStatus.textContent = "Status: Login required to verify subscription.";
       }
     }
 
-    function activatePlan(planKey) {
-      const plan = plans[planKey];
-      if (!plan) return;
-      const until = Date.now() + plan.ms;
-      localStorage.setItem(ACCESS_UNTIL_KEY, String(until));
-      localStorage.setItem(ACCESS_PLAN_KEY, planKey);
-      renderState();
-      alert(`Mock access unlocked for ${plan.label} plan (₹${plan.amount}).`);
-    }
-
-    document.querySelectorAll(".plan-btn").forEach((btn) => {
-      btn.addEventListener("click", () => activatePlan(btn.dataset.plan));
-    });
-
     document.querySelectorAll(".start-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (!hasAccess()) {
-          const pricing = document.getElementById("pricing");
-          pricing.classList.add("highlight");
-          pricing.scrollIntoView({ behavior: "smooth", block: "start" });
-          setTimeout(() => pricing.classList.remove("highlight"), 1200);
-          return;
+      btn.addEventListener("click", async () => {
+        try {
+          const r = await studypro.api("/api/access/mock");
+          if (!r.allowed) return window.location.href = "/dashboard.html";
+          alert("Test launch is UI-only in this build.");
+        } catch (_) {
+          window.location.href = "/login.html";
         }
-        alert("Test launch is UI-only in this static build.");
       });
     });
 
-    setInterval(renderState, 30000);
     document.getElementById("year").textContent = new Date().getFullYear();
-    renderState();
+    studypro.ensureAuthLinks();
+    studypro.lockSection("mock");
+    applyServerAccess();
   </script>
 </body>
 </html>

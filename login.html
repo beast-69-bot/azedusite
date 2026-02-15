@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Login</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#f4f7fb;color:#142033}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(940px,100%)}
+    .card{background:#fff;border:1px solid #e4ebf5;border-radius:16px;padding:20px;box-shadow:0 14px 28px rgba(15,31,58,.08)}
+    h2{margin:0 0 10px} label{display:block;font-size:.85rem;font-weight:700;margin:8px 0 4px}
+    input{width:100%;padding:10px 11px;border:1px solid #d9e3f5;border-radius:10px}
+    button{margin-top:12px;border:none;background:#0f5bd8;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    .msg{margin-top:10px;font-size:.9rem}
+    .ok{color:#166534}.err{color:#b91c1c}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="grid">
+      <div class="card">
+        <h2>Login</h2>
+        <form id="loginForm">
+          <label>Email</label><input type="email" id="loginEmail" required />
+          <label>Password</label><input type="password" id="loginPassword" required />
+          <button type="submit">Login</button>
+          <div id="loginMsg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Create Account</h2>
+        <form id="registerForm">
+          <label>Name</label><input type="text" id="regName" required />
+          <label>Email</label><input type="email" id="regEmail" required />
+          <label>Password</label><input type="password" id="regPassword" minlength="6" required />
+          <button type="submit">Register</button>
+          <div id="registerMsg" class="msg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/app.js"></script>
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const loginMsg = document.getElementById("loginMsg");
+    const registerMsg = document.getElementById("registerMsg");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginMsg.textContent = "";
+      try {
+        await studypro.api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            email: document.getElementById("loginEmail").value.trim(),
+            password: document.getElementById("loginPassword").value
+          })
+        });
+        window.location.href = "/dashboard.html";
+      } catch (err) {
+        loginMsg.textContent = err.message;
+        loginMsg.className = "msg err";
+      }
+    });
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      registerMsg.textContent = "";
+      try {
+        await studypro.api("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            name: document.getElementById("regName").value.trim(),
+            email: document.getElementById("regEmail").value.trim(),
+            password: document.getElementById("regPassword").value
+          })
+        });
+        window.location.href = "/dashboard.html";
+      } catch (err) {
+        registerMsg.textContent = err.message;
+        registerMsg.className = "msg err";
+      }
+    });
+  </script>
+</body>
+</html>

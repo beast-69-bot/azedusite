@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Dashboard</title>
+  <style>
+    body{margin:0;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#f4f7fb;color:#142033}
+    .container{width:min(1120px,92%);margin:0 auto}
+    .nav{background:#fff;border-bottom:1px solid #e4ebf5}
+    .nav .inner{min-height:64px;display:flex;align-items:center;justify-content:space-between}
+    .links a{text-decoration:none;color:#1e2c41;margin-left:12px;font-weight:600}
+    .hero{padding:30px 0}
+    .grid{display:grid;gap:16px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{background:#fff;border:1px solid #e4ebf5;border-radius:16px;padding:18px;box-shadow:0 14px 28px rgba(15,31,58,.08)}
+    .price{font-size:1.45rem;font-weight:800}
+    button{border:none;background:#0f5bd8;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    .pill{display:inline-block;font-size:.8rem;padding:4px 10px;border-radius:999px;background:#e9f1ff;color:#0f5bd8}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e4ebf5;text-align:left}
+    .muted{color:#5d6b82}
+    @media (max-width:980px){.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div class="container inner">
+      <strong>StudyPro Academy</strong>
+      <div class="links">
+        <a href="/index.html">Home</a>
+        <a href="/courses.html">Courses</a>
+        <a href="/pyqs.html">PYQs</a>
+        <a href="/mock.html">Mock</a>
+        <a href="#" id="logoutBtn">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container hero">
+    <h1 style="margin:0 0 8px;">User Dashboard</h1>
+    <p class="muted" id="userLine">Loading...</p>
+    <p><span class="pill" id="subStatus">No active plan</span></p>
+  </div>
+
+  <div class="container">
+    <h2>Single Subscription Plans (Valid for Courses + Books + PYQs + Mock Tests)</h2>
+    <div class="grid grid-3" style="margin-bottom:18px;">
+      <div class="card"><h3>Daily Plan</h3><div class="price">₹9</div><p class="muted">Valid 1 day for all sections.</p><button data-plan="daily" class="payBtn">Pay ₹9</button></div>
+      <div class="card"><h3>7 Day Plan</h3><div class="price">₹29</div><p class="muted">Valid 7 days for all sections.</p><button data-plan="weekly" class="payBtn">Pay ₹29</button></div>
+      <div class="card"><h3>Monthly Plan</h3><div class="price">₹99</div><p class="muted">Valid 30 days for all sections.</p><button data-plan="monthly" class="payBtn">Pay ₹99</button></div>
+    </div>
+
+    <div class="card">
+      <h3>Payment History</h3>
+      <table>
+        <thead><tr><th>Plan</th><th>Amount</th><th>Ref</th><th>Status</th><th>Paid At</th></tr></thead>
+        <tbody id="paymentBody"><tr><td colspan="5" class="muted">No payments yet</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="card" id="adminCard" style="display:none;margin-top:16px;">
+      <h3>Admin Overview</h3>
+      <p class="muted" id="adminStats">Loading...</p>
+    </div>
+  </div>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    const userLine = document.getElementById("userLine");
+    const subStatus = document.getElementById("subStatus");
+    const paymentBody = document.getElementById("paymentBody");
+    const adminCard = document.getElementById("adminCard");
+    const adminStats = document.getElementById("adminStats");
+    let currentUser = null;
+
+    async function loadMe() {
+      try {
+        const data = await studypro.api("/api/auth/me");
+        currentUser = data.user;
+        userLine.textContent = `${data.user.name} (${data.user.email})`;
+        if (data.subscription) {
+          subStatus.textContent = `Active: ${data.subscription.plan_key} until ${new Date(data.subscription.ends_at).toLocaleString()}`;
+        } else {
+          subStatus.textContent = "No active plan";
+        }
+        if (data.user.role === "admin") {
+          adminCard.style.display = "block";
+          const ov = await studypro.api("/api/admin/overview");
+          adminStats.textContent = `Users: ${ov.stats.users} | Payments: ${ov.stats.payments} | Revenue: ₹${ov.stats.revenue} | Active Subs: ${ov.stats.activeSubscriptions}`;
+        }
+      } catch (_) {
+        window.location.href = "/login.html";
+      }
+    }
+
+    async function loadPayments() {
+      const data = await studypro.api("/api/payments/history");
+      if (!data.payments.length) return;
+      paymentBody.innerHTML = "";
+      data.payments.forEach((p) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${p.plan_key}</td><td>₹${p.amount}</td><td>${p.payment_ref}</td><td>${p.status}</td><td>${new Date(p.paid_at).toLocaleString()}</td>`;
+        paymentBody.appendChild(tr);
+      });
+    }
+
+    document.querySelectorAll(".payBtn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        await studypro.api("/api/payments/confirm", {
+          method: "POST",
+          body: JSON.stringify({ planKey: btn.dataset.plan })
+        });
+        await loadMe();
+        await loadPayments();
+        alert("Payment recorded and subscription activated.");
+      });
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await studypro.api("/api/auth/logout", { method: "POST" });
+      window.location.href = "/login.html";
+    });
+
+    loadMe().then(loadPayments);
+  </script>
+</body>
+</html>

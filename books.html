@@ -23,7 +23,15 @@
   </style>
 </head>
 <body>
-  <header class="navbar"><div class="container nav-wrap"><a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a><button class="menu-toggle" id="menuToggle" type="button">Menu</button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="courses.html">Courses</a></li><li><a class="active" href="books.html">Books</a></li><li><a href="pyqs.html">PYQs</a></li><li><a href="mock.html">Mock Tests</a></li><li><a href="index.html#results">Results</a></li><li><a href="contact.html">Contact</a></li></ul></div></header>
+  <header class="navbar"><div class="container nav-wrap"><a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a><button class="menu-toggle" id="menuToggle" type="button">Menu</button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="courses.html">Courses</a></li><li><a class="active" href="books.html">Books</a></li><li><a href="pyqs.html">PYQs</a></li><li><a href="mock.html">Mock Tests</a></li><li><a href="index.html#results">Results</a></li><li><a href="contact.html">Contact</a></li><li><a id="navLogin" href="login.html">Login</a></li><li><a id="navDashboard" href="dashboard.html" style="display:none">Dashboard</a></li><li><a id="navLogout" href="#" style="display:none">Logout</a></li></ul></div></header>
+  <div id="lockedOverlay" style="display:none;position:fixed;inset:0;background:rgba(10,18,33,.82);z-index:1200;color:#fff;align-items:center;justify-content:center;text-align:center;padding:20px;">
+    <div style="max-width:520px;background:#0f1b31;border:1px solid #284a7a;border-radius:14px;padding:22px;">
+      <h2 class="locked-title" style="margin:0 0 8px;">Subscription required</h2>
+      <p style="margin:0 0 14px;color:#cad8f7;">Buy one plan and access all sections: Courses, Books, PYQs, Mock Tests.</p>
+      <a href="login.html" class="btn btn-primary">Login / Continue</a>
+      <a href="dashboard.html" class="btn btn-outline">View Plans</a>
+    </div>
+  </div>
   <section class="hero"><div class="container"><span class="eyebrow">StudyPro Academy</span><h1>Books, Notes & Revision Resources</h1><p>High-impact study material designed for fast revision and concept clarity.</p></div></section>
   <main>
     <section>
@@ -42,6 +50,7 @@
     </section>
   </main>
   <footer class="footer"><div class="container"><div class="footer-grid"><div><h4>StudyPro Academy</h4><p style="margin:0;color:#bbcae8">Subscription-based digital learning service for JEE & NEET preparation.</p></div><div><h4>Explore</h4><a href="courses.html">Courses</a><br><a href="books.html">Books & Notes</a><br><a href="pyqs.html">PYQs</a><br><a href="mock.html">Mock Tests</a></div><div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a><br><a href="refund.html">Refund Policy</a><br><a href="contact.html">Contact</a></div></div><div class="copy">© <span id="year"></span> StudyPro Academy. All rights reserved.</div></div></footer>
+  <script src="/assets/app.js"></script>
   <script>
     const menuToggle=document.getElementById("menuToggle"),navLinks=document.getElementById("navLinks");
     menuToggle.addEventListener("click",()=>navLinks.classList.toggle("open"));
@@ -49,6 +58,8 @@
     const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("visible")}),{threshold:.14});
     document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
     document.getElementById("year").textContent=new Date().getFullYear();
+    studypro.ensureAuthLinks();
+    studypro.lockSection("books");
   </script>
 </body>
 </html>

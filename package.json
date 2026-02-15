@@ -1,0 +1,16 @@
+{
+  "name": "studypro-academy",
+  "version": "1.0.0",
+  "description": "StudyPro Academy full-stack app with auth, subscriptions and payment records",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

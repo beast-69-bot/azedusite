@@ -251,12 +251,17 @@
       const cleaned = pass.replace(/[\u200B-\u200D\uFEFF]/g, "");
       const normalized = cleaned.normalize("NFKC");
       const normalizedLower = normalized.toLowerCase();
+      const token = normalizedLower.replace(/[^a-z0-9]/g, "");
+      const adminToken = ADMIN_PASSWORD.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const fallbackToken = FALLBACK_PASSWORD.toLowerCase().replace(/[^a-z0-9]/g, "");
 
       if (
         normalized === ADMIN_PASSWORD ||
         normalized === FALLBACK_PASSWORD ||
         normalizedLower === ADMIN_PASSWORD.toLowerCase() ||
-        normalizedLower === "anshu@a2025#fl"
+        normalizedLower === "anshu@a2025#fl" ||
+        token === adminToken ||
+        token === fallbackToken
       ) {
         setSessionUntil(Date.now() + SESSION_MS);
         unlockAdmin();

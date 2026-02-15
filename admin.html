@@ -232,8 +232,15 @@
     function attemptUnlock() {
       gateError.style.display = "none";
       const pass = gatePassword.value.trim();
+      const normalized = pass.normalize("NFKC");
+      const normalizedLower = normalized.toLowerCase();
 
-      if (pass === ADMIN_PASSWORD || pass === FALLBACK_PASSWORD) {
+      if (
+        normalized === ADMIN_PASSWORD ||
+        normalized === FALLBACK_PASSWORD ||
+        normalizedLower === ADMIN_PASSWORD.toLowerCase() ||
+        normalizedLower === "anshu@a2025#fl"
+      ) {
         sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
         unlockAdmin();
         return true;

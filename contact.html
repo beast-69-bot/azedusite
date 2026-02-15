@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Contact</title>
+  <style>
+    :root{--bg:#f4f7fb;--surface:#fff;--text:#142033;--muted:#5d6b82;--primary:#0f5bd8;--line:#e4ebf5;--radius:16px;--shadow:0 14px 28px rgba(15,31,58,.08)}
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}.container{width:min(1120px,92%);margin:0 auto}
+    .navbar{position:sticky;top:0;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}.nav-wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{text-decoration:none;color:var(--text)}.brand strong{display:block}.brand span{font-size:.78rem;color:var(--muted)}.menu-toggle{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px}
+    .nav-links{list-style:none;display:flex;gap:8px;margin:0;padding:0}.nav-links a{text-decoration:none;color:#1e2c41;font-weight:600;font-size:.94rem;padding:8px 11px;border-radius:10px}.nav-links a:hover,.nav-links a.active{background:#e9f0ff;color:var(--primary)}
+    .hero{padding:80px 0;color:#f2f7ff;background:radial-gradient(circle at 10% 10%,#194392 0,transparent 42%),linear-gradient(135deg,#0a1630,#102c5f)}.eyebrow{display:inline-block;padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-size:.76rem;text-transform:uppercase}
+    h1{margin:12px 0 10px;font-size:clamp(1.8rem,4vw,2.6rem)}.hero p{margin:0;color:#d4def2;max-width:720px}
+    section{padding:62px 0}.section-title{margin:0 0 8px;font-size:clamp(1.3rem,2.1vw,1.9rem)}.section-sub{margin:0 0 22px;color:var(--muted)}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit}.input{margin-bottom:10px}textarea{min-height:140px;resize:vertical;margin-bottom:10px}
+    .btn{display:inline-block;border-radius:12px;padding:9px 14px;font-weight:700;text-decoration:none;border:none;cursor:pointer}.btn-primary{background:var(--primary);color:#fff}
+    .footer{margin-top:28px;padding:38px 0 24px;background:#0e1d38;color:#c8d7f4}.footer-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}.footer h4{margin:0 0 8px;color:#f5f8ff}.footer a{text-decoration:none;color:#d6e2ff;font-size:.92rem}.copy{border-top:1px solid rgba(210,225,255,.2);margin-top:12px;padding-top:10px;font-size:.85rem;color:#9eb3db}
+    @media (max-width:980px){.grid-2,.footer-grid{grid-template-columns:1fr}.menu-toggle{display:inline-flex}.nav-links{display:none;position:absolute;top:72px;right:4%;width:min(320px,92%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow);flex-direction:column;align-items:flex-start}.nav-links.open{display:flex}}
+  </style>
+</head>
+<body>
+  <header class="navbar"><div class="container nav-wrap"><a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a><button class="menu-toggle" id="menuToggle" type="button">Menu</button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="courses.html">Courses</a></li><li><a href="books.html">Books</a></li><li><a href="pyqs.html">PYQs</a></li><li><a href="mock.html">Mock Tests</a></li><li><a href="index.html#results">Results</a></li><li><a class="active" href="contact.html">Contact</a></li></ul></div></header>
+  <section class="hero"><div class="container"><span class="eyebrow">StudyPro Academy</span><h1>Contact & Support</h1><p>Reach out for subscription and learning support queries.</p></div></section>
+  <main>
+    <section>
+      <div class="container">
+        <h2 class="section-title">Get in Touch</h2>
+        <p class="section-sub">Form submission is UI-only in this static production layout.</p>
+        <div class="grid grid-2">
+          <article class="card"><h3 style="margin-top:0">Contact Form</h3><form id="contactForm"><input class="input" type="text" placeholder="Name" required><input class="input" type="email" placeholder="Email" required><textarea placeholder="Message" required></textarea><button class="btn btn-primary" type="submit">Submit</button></form></article>
+          <article class="card"><h3 style="margin-top:0">Support Details</h3><p>Email: support@studyproacademy.example</p><p>Phone: +91-90000-00000</p><p>Support Hours: Mon-Sat, 9:00 AM - 7:00 PM IST</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer"><div class="container"><div class="footer-grid"><div><h4>StudyPro Academy</h4><p style="margin:0;color:#bbcae8">Subscription-based digital learning service for JEE & NEET preparation.</p></div><div><h4>Explore</h4><a href="courses.html">Courses</a><br><a href="books.html">Books & Notes</a><br><a href="pyqs.html">PYQs</a><br><a href="mock.html">Mock Tests</a></div><div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a><br><a href="refund.html">Refund Policy</a><br><a href="contact.html">Contact</a></div></div><div class="copy">© <span id="year"></span> StudyPro Academy. All rights reserved.</div></div></footer>
+  <script>
+    const menuToggle=document.getElementById("menuToggle"),navLinks=document.getElementById("navLinks"),form=document.getElementById("contactForm");
+    menuToggle.addEventListener("click",()=>navLinks.classList.toggle("open"));
+    navLinks.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>navLinks.classList.remove("open")));
+    form.addEventListener("submit",e=>{e.preventDefault();alert("Thanks! This demo form is UI-only.");form.reset();});
+    document.getElementById("year").textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>

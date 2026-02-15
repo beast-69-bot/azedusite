@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Refund Policy</title>
+  <style>
+    :root{--bg:#f4f7fb;--surface:#fff;--text:#142033;--muted:#5d6b82;--primary:#0f5bd8;--line:#e4ebf5;--radius:16px;--shadow:0 14px 28px rgba(15,31,58,.08)}
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}.container{width:min(980px,92%);margin:0 auto}
+    .navbar{position:sticky;top:0;z-index:999;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}.nav-wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{text-decoration:none;color:var(--text)}.brand strong{display:block}.brand span{font-size:.78rem;color:var(--muted)}.menu-toggle{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px}
+    .nav-links{list-style:none;display:flex;gap:8px;margin:0;padding:0}.nav-links a{text-decoration:none;color:#1e2c41;font-weight:600;font-size:.94rem;padding:8px 11px;border-radius:10px}.nav-links a:hover,.nav-links a.active{background:#e9f0ff;color:var(--primary)}
+    .hero{padding:80px 0;color:#f2f7ff;background:radial-gradient(circle at 10% 10%,#194392 0,transparent 42%),linear-gradient(135deg,#0a1630,#102c5f)}h1{margin:0;font-size:clamp(1.8rem,4vw,2.6rem)}.hero p{margin:8px 0 0;color:#d4def2}
+    section{padding:58px 0}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}.card p{color:#2b3f5d}
+    .footer{margin-top:28px;padding:30px 0 20px;background:#0e1d38;color:#c8d7f4}.copy{font-size:.85rem;color:#9eb3db}
+    @media (max-width:980px){.menu-toggle{display:inline-flex}.nav-links{display:none;position:absolute;top:72px;right:4%;width:min(320px,92%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow);flex-direction:column;align-items:flex-start}.nav-links.open{display:flex}}
+  </style>
+</head>
+<body>
+  <header class="navbar"><div class="container nav-wrap"><a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a><button class="menu-toggle" id="menuToggle" type="button">Menu</button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="courses.html">Courses</a></li><li><a href="books.html">Books</a></li><li><a href="pyqs.html">PYQs</a></li><li><a href="mock.html">Mock Tests</a></li><li><a href="index.html#results">Results</a></li><li><a href="contact.html">Contact</a></li></ul></div></header>
+  <section class="hero"><div class="container"><h1>Refund Policy</h1><p>Effective Date: February 15, 2026</p></div></section>
+  <main><section><div class="container"><article class="card"><p>StudyPro Academy is a subscription-based digital learning service. Refund requests are accepted within 3 calendar days from successful payment only if less than 10% of subscribed content has been accessed.</p><p>Eligibility is evaluated using platform activity logs, including content views, notes downloads, and test attempts.</p><p>Requests made after 3 days from purchase, or accounts with content usage above 10%, are not eligible for refund.</p><p>Approved refunds are processed through the original payment method based on banking timelines. Delays may occur due to payment provider policies.</p><p>For refund requests, contact support with registered email and transaction details.</p></article></div></section></main>
+  <footer class="footer"><div class="container"><div class="copy">© <span id="year"></span> StudyPro Academy. All rights reserved. | <a href="privacy.html" style="color:#d6e2ff">Privacy Policy</a> | <a href="terms.html" style="color:#d6e2ff">Terms</a></div></div></footer>
+  <script>
+    const menuToggle=document.getElementById("menuToggle"),navLinks=document.getElementById("navLinks");
+    menuToggle.addEventListener("click",()=>navLinks.classList.toggle("open"));
+    navLinks.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>navLinks.classList.remove("open")));
+    document.getElementById("year").textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>

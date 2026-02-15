@@ -194,6 +194,7 @@
   </div>
 
   <script>
+    const ADMIN_PASSWORD = "studypro@admin2026";
     const ADMIN_PASSWORD_HASH = "7952454cd9f1895d55133b782eed1746e1a609bb538c275832c29dfe63ada2b2";
     const SESSION_KEY = "studypro_admin_session_until";
     const SESSION_MS = 30 * 60 * 1000;
@@ -228,19 +229,25 @@
     gateForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       gateError.style.display = "none";
-      const pass = gatePassword.value;
-      const hash = await sha256(pass);
-      if (hash === ADMIN_PASSWORD_HASH) {
+      const pass = gatePassword.value.trim();
+
+      if (pass === ADMIN_PASSWORD) {
         sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
         unlockAdmin();
         return;
       }
+
+      try {
+        const hash = await sha256(pass);
+        if (hash === ADMIN_PASSWORD_HASH) {
+          sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
+          unlockAdmin();
+          return;
+        }
+      } catch (_) {}
+
       gateError.style.display = "block";
-      gateForm.reset();
       gatePassword.focus();
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1200);
     });
 
     if (isSessionValid()) {

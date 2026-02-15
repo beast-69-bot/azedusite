@@ -65,7 +65,7 @@
       <form id="gateForm">
         <label>Passcode</label>
         <input type="password" id="gatePassword" required />
-        <div class="btn-row"><button class="btn btn-primary" type="submit">Unlock Admin</button></div>
+        <div class="btn-row"><button class="btn btn-primary" id="unlockBtn" type="button">Unlock Admin</button></div>
       </form>
       <p id="gateError" class="gate-error">Invalid passcode.</p>
       <p class="gate-note">Client-side protection only. For strong security, use backend authentication.</p>
@@ -195,7 +195,6 @@
 
   <script>
     const ADMIN_PASSWORD = "studypro@admin2026";
-    const ADMIN_PASSWORD_HASH = "7952454cd9f1895d55133b782eed1746e1a609bb538c275832c29dfe63ada2b2";
     const SESSION_KEY = "studypro_admin_session_until";
     const SESSION_MS = 30 * 60 * 1000;
 
@@ -204,13 +203,8 @@
     const gateForm = document.getElementById("gateForm");
     const gatePassword = document.getElementById("gatePassword");
     const gateError = document.getElementById("gateError");
+    const unlockBtn = document.getElementById("unlockBtn");
     let initialized = false;
-
-    async function sha256(input) {
-      const enc = new TextEncoder().encode(input);
-      const buff = await crypto.subtle.digest("SHA-256", enc);
-      return Array.from(new Uint8Array(buff)).map((b) => b.toString(16).padStart(2, "0")).join("");
-    }
 
     function isSessionValid() {
       const until = Number(sessionStorage.getItem(SESSION_KEY) || 0);
@@ -226,28 +220,35 @@
       }
     }
 
-    gateForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    function attemptUnlock() {
       gateError.style.display = "none";
       const pass = gatePassword.value.trim();
 
       if (pass === ADMIN_PASSWORD) {
         sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
         unlockAdmin();
-        return;
+        return true;
       }
-
-      try {
-        const hash = await sha256(pass);
-        if (hash === ADMIN_PASSWORD_HASH) {
-          sessionStorage.setItem(SESSION_KEY, String(Date.now() + SESSION_MS));
-          unlockAdmin();
-          return;
-        }
-      } catch (_) {}
-
+      gateError.textContent = "Invalid passcode. Please try again.";
       gateError.style.display = "block";
       gatePassword.focus();
+      return false;
+    }
+
+    gateForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      attemptUnlock();
+    });
+
+    unlockBtn.addEventListener("click", () => {
+      attemptUnlock();
+    });
+
+    gatePassword.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        attemptUnlock();
+      }
     });
 
     if (isSessionValid()) {

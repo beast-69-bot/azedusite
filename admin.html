@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Admin Panel</title>
+  <style>
+    :root{--bg:#f4f7fb;--surface:#fff;--text:#142033;--muted:#5d6b82;--primary:#0f5bd8;--line:#e4ebf5;--radius:16px;--shadow:0 14px 28px rgba(15,31,58,.08)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    .container{width:min(1120px,92%);margin:0 auto}
+    .navbar{position:sticky;top:0;z-index:999;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .nav-wrap{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{text-decoration:none;color:var(--text)}.brand strong{display:block}.brand span{font-size:.78rem;color:var(--muted)}
+    .nav-links{list-style:none;display:flex;gap:8px;margin:0;padding:0}
+    .nav-links a{text-decoration:none;color:#1e2c41;font-weight:600;font-size:.94rem;padding:8px 11px;border-radius:10px}
+    .nav-links a:hover,.nav-links a.active{background:#e9f0ff;color:var(--primary)}
+    .hero{padding:70px 0;color:#f2f7ff;background:radial-gradient(circle at 10% 10%,#194392 0,transparent 42%),linear-gradient(135deg,#0a1630,#102c5f)}
+    .hero h1{margin:0 0 8px;font-size:clamp(1.8rem,4vw,2.6rem)} .hero p{margin:0;color:#d4def2}
+    section{padding:50px 0}
+    .grid{display:grid;gap:16px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .card h3{margin:0 0 10px}
+    label{display:block;font-size:.84rem;font-weight:700;color:#304766;margin:8px 0 4px}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 11px;font:inherit;background:#fff}
+    textarea{min-height:88px;resize:vertical}
+    .btn{display:inline-block;border-radius:12px;padding:9px 14px;font-weight:700;text-decoration:none;border:none;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-danger{background:#fee2e2;color:#8b1c1c;border:1px solid #fecaca}
+    .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;color:#486284}
+    .empty{color:var(--muted);font-size:.92rem}
+    .footer{margin-top:28px;padding:30px 0 20px;background:#0e1d38;color:#c8d7f4}
+    .copy{font-size:.85rem;color:#9eb3db}
+    @media (max-width:980px){.grid-3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html"><strong>StudyPro Academy</strong><span>Crack JEE & NEET with structured learning.</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="courses.html">Courses</a></li>
+        <li><a href="books.html">Books</a></li>
+        <li><a href="pyqs.html">PYQs</a></li>
+        <li><a class="active" href="admin.html">Admin</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Admin Content Manager</h1>
+      <p>Add and manage Courses, Books, and PYQs content (stored in browser local storage).</p>
+    </div>
+  </section>
+
+  <main>
+    <section>
+      <div class="container grid grid-3">
+        <article class="card">
+          <h3>Add Course</h3>
+          <form id="courseForm">
+            <label>Course Name</label>
+            <input type="text" id="courseName" required />
+            <label>Stream</label>
+            <select id="courseStream" required>
+              <option value="">Select Stream</option>
+              <option>JEE</option>
+              <option>NEET</option>
+            </select>
+            <label>Duration</label>
+            <input type="text" id="courseDuration" placeholder="e.g. 12 Months" required />
+            <label>Price (INR)</label>
+            <input type="number" id="coursePrice" min="0" required />
+            <div class="btn-row"><button class="btn btn-primary" type="submit">Add Course</button></div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Add Book/Notes</h3>
+          <form id="bookForm">
+            <label>Title</label>
+            <input type="text" id="bookTitle" required />
+            <label>Category</label>
+            <select id="bookCategory" required>
+              <option value="">Select Category</option>
+              <option>Physics Notes</option>
+              <option>Chemistry Notes</option>
+              <option>Biology Notes</option>
+              <option>Mathematics Notes</option>
+              <option>Formula Sheets</option>
+              <option>NCERT Quick Revision</option>
+            </select>
+            <label>Description</label>
+            <textarea id="bookDesc" required></textarea>
+            <div class="btn-row"><button class="btn btn-primary" type="submit">Add Book</button></div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Add PYQ Set</h3>
+          <form id="pyqForm">
+            <label>Exam</label>
+            <select id="pyqExam" required>
+              <option value="">Select Exam</option>
+              <option>JEE Main</option>
+              <option>JEE Advanced</option>
+              <option>NEET</option>
+            </select>
+            <label>Year</label>
+            <input type="number" id="pyqYear" min="2000" max="2099" required />
+            <label>Subject</label>
+            <input type="text" id="pyqSubject" placeholder="Physics / Chemistry / Biology / Maths" required />
+            <label>Topic</label>
+            <input type="text" id="pyqTopic" required />
+            <div class="btn-row"><button class="btn btn-primary" type="submit">Add PYQ</button></div>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <article class="card" style="margin-bottom:16px;">
+          <h3 style="margin-top:0;">Courses List</h3>
+          <div class="table-wrap">
+            <table id="coursesTable">
+              <thead><tr><th>Name</th><th>Stream</th><th>Duration</th><th>Price</th><th>Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" id="coursesEmpty">No courses added yet.</p>
+        </article>
+
+        <article class="card" style="margin-bottom:16px;">
+          <h3 style="margin-top:0;">Books List</h3>
+          <div class="table-wrap">
+            <table id="booksTable">
+              <thead><tr><th>Title</th><th>Category</th><th>Description</th><th>Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" id="booksEmpty">No books added yet.</p>
+        </article>
+
+        <article class="card">
+          <h3 style="margin-top:0;">PYQs List</h3>
+          <div class="table-wrap">
+            <table id="pyqsTable">
+              <thead><tr><th>Exam</th><th>Year</th><th>Subject</th><th>Topic</th><th>Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" id="pyqsEmpty">No PYQs added yet.</p>
+          <div class="btn-row">
+            <button class="btn btn-danger" id="clearAllBtn" type="button">Clear All Data</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="copy">&copy; <span id="year"></span> StudyPro Academy. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const KEYS = {
+      courses: "studypro_admin_courses",
+      books: "studypro_admin_books",
+      pyqs: "studypro_admin_pyqs"
+    };
+
+    const getData = (key) => JSON.parse(localStorage.getItem(key) || "[]");
+    const setData = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+
+    function removeItem(key, index) {
+      const data = getData(key);
+      data.splice(index, 1);
+      setData(key, data);
+      renderAll();
+    }
+
+    function renderCourses() {
+      const data = getData(KEYS.courses);
+      const tbody = document.querySelector("#coursesTable tbody");
+      const empty = document.getElementById("coursesEmpty");
+      tbody.innerHTML = "";
+      empty.style.display = data.length ? "none" : "block";
+      data.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${item.name}</td><td>${item.stream}</td><td>${item.duration}</td><td>INR ${item.price}</td><td><button class="btn btn-danger" data-key="courses" data-index="${index}">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderBooks() {
+      const data = getData(KEYS.books);
+      const tbody = document.querySelector("#booksTable tbody");
+      const empty = document.getElementById("booksEmpty");
+      tbody.innerHTML = "";
+      empty.style.display = data.length ? "none" : "block";
+      data.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${item.title}</td><td>${item.category}</td><td>${item.description}</td><td><button class="btn btn-danger" data-key="books" data-index="${index}">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPyqs() {
+      const data = getData(KEYS.pyqs);
+      const tbody = document.querySelector("#pyqsTable tbody");
+      const empty = document.getElementById("pyqsEmpty");
+      tbody.innerHTML = "";
+      empty.style.display = data.length ? "none" : "block";
+      data.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${item.exam}</td><td>${item.year}</td><td>${item.subject}</td><td>${item.topic}</td><td><button class="btn btn-danger" data-key="pyqs" data-index="${index}">Delete</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAll() {
+      renderCourses();
+      renderBooks();
+      renderPyqs();
+    }
+
+    document.getElementById("courseForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = getData(KEYS.courses);
+      data.push({
+        name: document.getElementById("courseName").value.trim(),
+        stream: document.getElementById("courseStream").value,
+        duration: document.getElementById("courseDuration").value.trim(),
+        price: document.getElementById("coursePrice").value
+      });
+      setData(KEYS.courses, data);
+      e.target.reset();
+      renderCourses();
+    });
+
+    document.getElementById("bookForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = getData(KEYS.books);
+      data.push({
+        title: document.getElementById("bookTitle").value.trim(),
+        category: document.getElementById("bookCategory").value,
+        description: document.getElementById("bookDesc").value.trim()
+      });
+      setData(KEYS.books, data);
+      e.target.reset();
+      renderBooks();
+    });
+
+    document.getElementById("pyqForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = getData(KEYS.pyqs);
+      data.push({
+        exam: document.getElementById("pyqExam").value,
+        year: document.getElementById("pyqYear").value,
+        subject: document.getElementById("pyqSubject").value.trim(),
+        topic: document.getElementById("pyqTopic").value.trim()
+      });
+      setData(KEYS.pyqs, data);
+      e.target.reset();
+      renderPyqs();
+    });
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-key]");
+      if (!btn) return;
+      const key = btn.getAttribute("data-key");
+      const index = Number(btn.getAttribute("data-index"));
+      if (key === "courses") removeItem(KEYS.courses, index);
+      if (key === "books") removeItem(KEYS.books, index);
+      if (key === "pyqs") removeItem(KEYS.pyqs, index);
+    });
+
+    document.getElementById("clearAllBtn").addEventListener("click", () => {
+      const ok = confirm("Clear all admin data for courses, books, and PYQs?");
+      if (!ok) return;
+      localStorage.removeItem(KEYS.courses);
+      localStorage.removeItem(KEYS.books);
+      localStorage.removeItem(KEYS.pyqs);
+      renderAll();
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderAll();
+  </script>
+</body>
+</html>

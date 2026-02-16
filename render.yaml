@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: studypro-academy
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@studyproacademy.in
+      - key: ADMIN_PASSWORD
+        value: ChangeMe@123

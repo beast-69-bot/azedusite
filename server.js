@@ -9,6 +9,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "change-this-secret";
 const DB_FILE = path.join(__dirname, "data.json");
+const WHATSAPP_WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL || "";
+const EMAIL_WEBHOOK_URL = process.env.EMAIL_WEBHOOK_URL || "";
 
 const PLANS = {
   daily: { label: "Daily", amount: 9, days: 1 },
@@ -198,6 +200,28 @@ function issueToken(res, user) {
   return payload;
 }
 
+async function postWebhook(url, payload) {
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.error("Webhook alert failed:", err.message);
+  }
+}
+
+async function sendPaymentAlerts({ payment, user }) {
+  const msg = `New pending payment | User: ${user.name} (${user.email}) | User ID: ${user.id} | Plan: ${payment.plan_key} | Amount: Rs ${payment.amount} | UTR: ${payment.utr} | Ref: ${payment.payment_ref}`;
+  console.log(msg);
+  await Promise.all([
+    postWebhook(WHATSAPP_WEBHOOK_URL, { channel: "whatsapp", message: msg, payment, user }),
+    postWebhook(EMAIL_WEBHOOK_URL, { channel: "email", subject: "New Pending UTR Payment", message: msg, payment, user })
+  ]);
+}
+
 function normalizeSection(value) {
   const section = String(value || "").toLowerCase().trim();
   return CONTENT_SECTIONS.includes(section) ? section : null;
@@ -271,13 +295,17 @@ app.get("/api/access/:section", authRequired, (req, res) => {
 });
 
 app.post("/api/payments/submit-utr", authRequired, (req, res) => {
-  const { planKey, utr } = req.body || {};
+  const { planKey, utr, screenshotData, screenshotName } = req.body || {};
   const plan = PLANS[planKey];
   if (!plan) return res.status(400).json({ ok: false, message: "Invalid plan" });
   const utrClean = String(utr || "").trim();
   if (!/^[a-zA-Z0-9-]{6,40}$/.test(utrClean)) {
     return res.status(400).json({ ok: false, message: "Invalid UTR format" });
   }
+  const shot = String(screenshotData || "");
+  const hasScreenshot = shot.startsWith("data:image/");
+  if (!hasScreenshot) return res.status(400).json({ ok: false, message: "Payment screenshot is required" });
+  if (shot.length > 2_000_000) return res.status(400).json({ ok: false, message: "Screenshot too large" });
 
   db.counters.payments += 1;
   const now = new Date().toISOString();
@@ -288,6 +316,8 @@ app.post("/api/payments/submit-utr", authRequired, (req, res) => {
     amount: plan.amount,
     payment_ref: `REQ-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
     utr: utrClean,
+    screenshot_data: shot,
+    screenshot_name: String(screenshotName || "payment-proof"),
     status: "pending",
     review_note: "",
     paid_at: now,
@@ -295,6 +325,8 @@ app.post("/api/payments/submit-utr", authRequired, (req, res) => {
   };
   db.payments.push(payment);
   saveDb(db);
+  const user = db.users.find((u) => u.id === req.user.id) || req.user;
+  sendPaymentAlerts({ payment, user });
   return res.json({ ok: true, payment });
 });
 

@@ -29,6 +29,9 @@
     .pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
     .published{background:#e8fff1;color:#166534}.draft{background:#fff5d6;color:#8a6400}
     .pending{background:#fff7e0;color:#a16207}.approved{background:#e8fff1;color:#166534}.declined{background:#ffe8e8;color:#b91c1c}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(10,18,33,.75);display:none;align-items:center;justify-content:center;padding:20px;z-index:1200}
+    .modal-card{width:min(760px,100%);background:#fff;border-radius:14px;padding:14px;border:1px solid #dbe7f8}
+    .modal-card img{max-width:100%;max-height:70vh;display:block;margin:auto;border-radius:10px}
     @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
   </style>
 </head>
@@ -79,8 +82,14 @@
 
     <section class="card">
       <h3>Payment Approvals</h3>
+      <div class="tabs" style="margin-bottom:10px;">
+        <button class="tab active pay-filter" data-filter="all">All</button>
+        <button class="tab pay-filter" data-filter="pending">Pending</button>
+        <button class="tab pay-filter" data-filter="approved">Approved</button>
+        <button class="tab pay-filter" data-filter="declined">Declined</button>
+      </div>
       <table>
-        <thead><tr><th>ID</th><th>User</th><th>Plan</th><th>Amount</th><th>UTR</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>ID</th><th>User</th><th>Plan</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody id="paymentsBody"><tr><td colspan="7" class="muted">No payments</td></tr></tbody>
       </table>
     </section>
@@ -89,6 +98,16 @@
       <h3>Users</h3>
       <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead><tbody id="usersBody"></tbody></table>
     </section>
+  </div>
+
+  <div class="modal-backdrop" id="proofModal">
+    <div class="modal-card">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong>Payment Proof</strong>
+        <button class="btn btn-muted" type="button" id="closeProofBtn">Close</button>
+      </div>
+      <img id="proofImage" alt="Payment proof" />
+    </div>
   </div>
 
   <script src="/assets/app.js"></script>
@@ -107,7 +126,10 @@
     const formTitle = document.getElementById("formTitle");
     const listTitle = document.getElementById("listTitle");
     const saveBtn = document.getElementById("saveBtn");
+    const proofModal = document.getElementById("proofModal");
+    const proofImage = document.getElementById("proofImage");
     let activeSection = "courses";
+    let paymentFilter = "all";
 
     function capitalize(x){ return x.charAt(0).toUpperCase()+x.slice(1); }
     function statusPill(status){ const s=String(status||"").toLowerCase(); return `<span class="pill ${s==='approved'?'approved':s==='declined'?'declined':'pending'}">${status}</span>`; }
@@ -144,14 +166,16 @@
 
     async function loadPayments(){
       const payments = await studypro.api("/api/admin/payments");
-      if(!payments.rows.length){ paymentsBody.innerHTML='<tr><td colspan="7" class="muted">No payments</td></tr>'; return; }
-      paymentsBody.innerHTML = payments.rows.map(p=>`
+      const rows = payments.rows.filter((p)=> paymentFilter==="all" ? true : String(p.status).toLowerCase()===paymentFilter);
+      if(!rows.length){ paymentsBody.innerHTML='<tr><td colspan="8" class="muted">No payments</td></tr>'; return; }
+      paymentsBody.innerHTML = rows.map(p=>`
         <tr>
           <td>${p.id}</td>
           <td>${p.name}<br><span class="muted">${p.email}</span><br><span class="muted">User ID: ${p.user_id}</span></td>
           <td>${p.plan_key}</td>
           <td>Rs ${p.amount}</td>
           <td>${p.utr || "-"}</td>
+          <td>${p.screenshot_data ? `<button class="btn btn-muted" data-pay-action="proof" data-id="${p.id}">View</button>` : "<span class='muted'>No proof</span>"}</td>
           <td>${statusPill(p.status)}</td>
           <td>
             ${p.status==="pending" ? `<div class="row"><button class="btn btn-success" data-pay-action="approve" data-id="${p.id}">Approve</button><button class="btn btn-danger" data-pay-action="decline" data-id="${p.id}">Decline</button></div>` : "<span class='muted'>Reviewed</span>"}
@@ -196,6 +220,14 @@
       const btn=e.target.closest("button[data-pay-action]");
       if(!btn) return;
       const id=btn.dataset.id;
+      if(btn.dataset.pay-action==="proof"){
+        const payments = await studypro.api("/api/admin/payments");
+        const row = payments.rows.find((x)=>String(x.id)===String(id));
+        if(!row || !row.screenshot_data) return;
+        proofImage.src = row.screenshot_data;
+        proofModal.style.display = "flex";
+        return;
+      }
       if(btn.dataset.pay-action==="approve"){
         await studypro.api(`/api/admin/payments/${id}/approve`, { method:"POST" });
       }else{
@@ -203,6 +235,26 @@
         await studypro.api(`/api/admin/payments/${id}/decline`, { method:"POST", body: JSON.stringify({ reason }) });
       }
       await loadBaseData();
+    });
+
+    document.querySelectorAll(".pay-filter").forEach((btn)=>{
+      btn.addEventListener("click", async ()=>{
+        document.querySelectorAll(".pay-filter").forEach((x)=>x.classList.remove("active"));
+        btn.classList.add("active");
+        paymentFilter = btn.dataset.filter;
+        await loadPayments();
+      });
+    });
+
+    document.getElementById("closeProofBtn").addEventListener("click", ()=>{
+      proofModal.style.display = "none";
+      proofImage.src = "";
+    });
+    proofModal.addEventListener("click", (e)=>{
+      if(e.target===proofModal){
+        proofModal.style.display = "none";
+        proofImage.src = "";
+      }
     });
 
     document.querySelectorAll(".tab").forEach(tab=>{

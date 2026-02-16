@@ -79,12 +79,16 @@
             <li>Plan select karo (Rs 9 / Rs 29 / Rs 99).</li>
             <li>QR scan karke exact amount pay karo.</li>
             <li>Payment app me transaction UTR copy karo.</li>
+            <li>Payment screenshot attach karo.</li>
             <li>Niche UTR submit karo for admin approval.</li>
           </ol>
           <form id="utrForm" style="margin-top:10px;">
             <input type="hidden" id="planKey" />
             <label for="utrInput" style="display:block;font-weight:700;margin:8px 0 4px;">Enter UTR Number</label>
             <input id="utrInput" required minlength="6" placeholder="e.g. 236541789021" style="width:100%;padding:10px;border:1px solid #dbe7f8;border-radius:10px;" />
+            <label for="screenshotInput" style="display:block;font-weight:700;margin:8px 0 4px;">Upload Payment Screenshot</label>
+            <input id="screenshotInput" type="file" accept="image/*" required style="width:100%;padding:8px;border:1px solid #dbe7f8;border-radius:10px;background:#fff;" />
+            <p class="muted" id="shotMeta" style="margin:6px 0 0;"></p>
             <button type="submit" style="margin-top:10px;">Submit UTR</button>
             <p id="utrMsg" class="muted"></p>
           </form>
@@ -118,6 +122,8 @@
     const selectedPlanText = document.getElementById("selectedPlanText");
     const planKeyInput = document.getElementById("planKey");
     const utrInput = document.getElementById("utrInput");
+    const screenshotInput = document.getElementById("screenshotInput");
+    const shotMeta = document.getElementById("shotMeta");
     const utrMsg = document.getElementById("utrMsg");
 
     function statusClass(s){
@@ -175,19 +181,41 @@
       e.preventDefault();
       utrMsg.textContent = "";
       try {
+        const file = screenshotInput.files && screenshotInput.files[0];
+        if (!file) throw new Error("Payment screenshot is required");
+        if (file.size > 1200 * 1024) throw new Error("Screenshot max size is 1.2MB");
+        const screenshotData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(new Error("Unable to read screenshot"));
+          reader.readAsDataURL(file);
+        });
         await studypro.api("/api/payments/submit-utr", {
           method: "POST",
           body: JSON.stringify({
             planKey: planKeyInput.value,
-            utr: utrInput.value.trim()
+            utr: utrInput.value.trim(),
+            screenshotData,
+            screenshotName: file.name
           })
         });
         utrInput.value = "";
+        screenshotInput.value = "";
+        shotMeta.textContent = "";
         utrMsg.textContent = "UTR submitted. Wait for admin approval.";
         await loadPayments();
       } catch (err) {
         utrMsg.textContent = err.message;
       }
+    });
+
+    screenshotInput.addEventListener("change", () => {
+      const file = screenshotInput.files && screenshotInput.files[0];
+      if (!file) {
+        shotMeta.textContent = "";
+        return;
+      }
+      shotMeta.textContent = `Attached: ${file.name} (${Math.round(file.size / 1024)} KB)`;
     });
 
     document.getElementById("logoutBtn").addEventListener("click", async (e) => {

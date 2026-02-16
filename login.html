@@ -1,187 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>StudyPro Academy | Login</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyPro Academy | Login & Signup</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap");
 
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #e0f7fa, #80deea);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
+    :root {
+      --bg: #0b1018;
+      --bg-soft: #121a28;
+      --line: #213047;
+      --text: #ecf2ff;
+      --muted: #9fb1ce;
+      --primary: #1770f0;
+      --primary-strong: #0f5bcb;
+      --radius: 16px;
+    }
 
-  .container {
-    display: flex;
-    gap: 40px;
-    padding: 20px;
-  }
+    * { box-sizing: border-box; }
 
-  form {
-    background-color: #ffffff;
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    width: 320px;
-  }
+    body {
+      margin: 0;
+      font-family: "Roboto", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 80% -10%, rgba(23, 112, 240, 0.35), transparent 34%),
+        radial-gradient(circle at 10% 110%, rgba(167, 47, 255, 0.22), transparent 35%),
+        linear-gradient(160deg, #070b12, #101827 48%, #0c1320);
+      min-height: 100vh;
+    }
 
-  form h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #00796b;
-    font-weight: 700;
-  }
+    .promo {
+      background: linear-gradient(90deg, #7f1fd1, #2367f2);
+      color: #f4f8ff;
+      text-align: center;
+      font-size: 0.92rem;
+      padding: 11px 12px;
+    }
 
-  label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #004d40;
-  }
+    .promo a {
+      color: #ffffff;
+      font-weight: 700;
+    }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: 1px solid #b2dfdb;
-    border-radius: 8px;
-    font-size: 15px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
+    .nav {
+      border-bottom: 1px solid rgba(159, 177, 206, 0.15);
+      backdrop-filter: blur(8px);
+      background: rgba(11, 16, 24, 0.7);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
 
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus {
-    outline: none;
-    border-color: #00796b;
-    box-shadow: 0 0 8px #00897b70;
-  }
-
-  button {
-    width: 100%;
-    background-color: #00796b;
-    color: white;
-    padding: 12px 0;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  button:hover {
-    background-color: #004d40;
-  }
-
-  .msg {
-    margin-top: 10px;
-    font-size: 14px;
-    min-height: 18px;
-  }
-
-  .ok { color: #166534; }
-  .err { color: #b91c1c; }
-
-  @media (max-width: 700px) {
     .container {
+      width: min(1180px, 92%);
+      margin: 0 auto;
+    }
+
+    .nav-wrap {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
       flex-direction: column;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand strong { font-size: 1.05rem; }
+    .brand span { font-size: 0.78rem; color: var(--muted); }
+
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #bfd0ee;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .auth-actions {
+      display: flex;
+      gap: 10px;
       align-items: center;
     }
-    form {
-      width: 90%;
-      max-width: 400px;
-      margin-bottom: 20px;
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 0.93rem;
     }
-  }
-</style>
+
+    .btn-outline {
+      color: #d8e6ff;
+      background: transparent;
+      border: 1px solid #2f435f;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--primary-strong); }
+
+    .main {
+      width: min(980px, 92%);
+      margin: 60px auto 24px;
+    }
+
+    .auth-card {
+      background: linear-gradient(160deg, rgba(18, 26, 40, 0.95), rgba(11, 16, 24, 0.95));
+      border: 1px solid #22324a;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid #23334b;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #9eb3d6;
+      padding: 14px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: rgba(23, 112, 240, 0.12);
+    }
+
+    .panel {
+      display: none;
+      padding: 26px;
+    }
+
+    .panel.active { display: block; }
+
+    .title {
+      margin: 0 0 6px;
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.86rem;
+      margin: 0 0 6px;
+      color: #cfe0ff;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #2b3c55;
+      background: #121c2b;
+      color: #ecf2ff;
+      padding: 12px 13px;
+      font: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4089f4;
+      box-shadow: 0 0 0 3px rgba(64, 137, 244, 0.2);
+    }
+
+    .submit-btn {
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover { background: var(--primary-strong); }
+
+    .msg {
+      min-height: 18px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .msg.err { color: #ff8e8e; }
+    .msg.ok { color: #99f2b8; }
+
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .main { margin-top: 34px; }
+      .panel { padding: 20px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="promo">
+    Access all sections in one subscription plan. <a href="/dashboard.html">View plans</a>
+  </div>
 
-<div class="container">
-  <form id="loginForm" action="#" method="POST">
-    <h2>Login</h2>
-    <label for="loginEmail">Email</label>
-    <input type="email" id="loginEmail" name="email" placeholder="Enter your email" required />
-    
-    <label for="loginPassword">Password</label>
-    <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required />
-    
-    <button type="submit">Login</button>
-    <div id="loginMsg" class="msg"></div>
-  </form>
+  <header class="nav">
+    <div class="container nav-wrap">
+      <a class="brand" href="/index.html">
+        <strong>StudyPro Academy</strong>
+        <span>Crack JEE & NEET with structured learning.</span>
+      </a>
 
-  <form id="registerForm" action="#" method="POST">
-    <h2>Create Account</h2>
-    <label for="registerName">Name</label>
-    <input type="text" id="registerName" name="name" placeholder="Enter your name" required />
-    
-    <label for="registerEmail">Email</label>
-    <input type="email" id="registerEmail" name="email" placeholder="Enter your email" required />
-    
-    <label for="registerPassword">Password</label>
-    <input type="password" id="registerPassword" name="password" placeholder="Create a password" required />
-    
-    <button type="submit">Register</button>
-    <div id="registerMsg" class="msg"></div>
-  </form>
-</div>
+      <nav class="nav-links">
+        <a href="/courses.html">Courses</a>
+        <a href="/books.html">Books</a>
+        <a href="/pyqs.html">PYQs</a>
+        <a href="/mock.html">Mock Tests</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
 
-<script src="/assets/app.js"></script>
-<script>
-  const loginForm = document.getElementById("loginForm");
-  const registerForm = document.getElementById("registerForm");
-  const loginMsg = document.getElementById("loginMsg");
-  const registerMsg = document.getElementById("registerMsg");
+      <div class="auth-actions">
+        <a href="#loginPanel" class="btn btn-outline" id="navLoginBtn">Log in</a>
+        <a href="#registerPanel" class="btn btn-primary" id="navRegisterBtn">Get started</a>
+      </div>
+    </div>
+  </header>
 
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    loginMsg.textContent = "";
-    try {
-      await studypro.api("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({
-          email: document.getElementById("loginEmail").value.trim(),
-          password: document.getElementById("loginPassword").value
-        })
-      });
-      window.location.href = "/dashboard.html";
-    } catch (err) {
-      loginMsg.textContent = err.message;
-      loginMsg.className = "msg err";
+  <main class="main">
+    <section class="auth-card">
+      <div class="tabs">
+        <button class="tab-btn active" id="loginTab" type="button">Log in</button>
+        <button class="tab-btn" id="registerTab" type="button">Get started</button>
+      </div>
+
+      <div class="panel active" id="loginPanel">
+        <h1 class="title">Welcome Back</h1>
+        <p class="subtitle">Login to continue your preparation.</p>
+        <form id="loginForm">
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="Enter your email" required />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required />
+          </div>
+          <button class="submit-btn" type="submit">Login</button>
+          <div class="msg" id="loginMsg"></div>
+        </form>
+      </div>
+
+      <div class="panel" id="registerPanel">
+        <h1 class="title">Create Account</h1>
+        <p class="subtitle">Get access to Courses, Books, PYQs and Mock Tests.</p>
+        <form id="registerForm">
+          <div class="field">
+            <label for="registerName">Name</label>
+            <input type="text" id="registerName" placeholder="Enter your name" required />
+          </div>
+          <div class="field">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" placeholder="Enter your email" required />
+          </div>
+          <div class="field">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" placeholder="Create password" minlength="6" required />
+          </div>
+          <button class="submit-btn" type="submit">Create Account</button>
+          <div class="msg" id="registerMsg"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginPanel = document.getElementById("loginPanel");
+    const registerPanel = document.getElementById("registerPanel");
+
+    function showLogin() {
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginPanel.classList.add("active");
+      registerPanel.classList.remove("active");
     }
-  });
 
-  registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    registerMsg.textContent = "";
-    try {
-      await studypro.api("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({
-          name: document.getElementById("registerName").value.trim(),
-          email: document.getElementById("registerEmail").value.trim(),
-          password: document.getElementById("registerPassword").value
-        })
-      });
-      window.location.href = "/dashboard.html";
-    } catch (err) {
-      registerMsg.textContent = err.message;
-      registerMsg.className = "msg err";
+    function showRegister() {
+      registerTab.classList.add("active");
+      loginTab.classList.remove("active");
+      registerPanel.classList.add("active");
+      loginPanel.classList.remove("active");
     }
-  });
-</script>
 
+    loginTab.addEventListener("click", showLogin);
+    registerTab.addEventListener("click", showRegister);
+    document.getElementById("navLoginBtn").addEventListener("click", (e) => { e.preventDefault(); showLogin(); });
+    document.getElementById("navRegisterBtn").addEventListener("click", (e) => { e.preventDefault(); showRegister(); });
+
+    const loginMsg = document.getElementById("loginMsg");
+    const registerMsg = document.getElementById("registerMsg");
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      loginMsg.textContent = "";
+      loginMsg.className = "msg";
+      try {
+        await studypro.api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            email: document.getElementById("loginEmail").value.trim(),
+            password: document.getElementById("loginPassword").value
+          })
+        });
+        window.location.href = "/dashboard.html";
+      } catch (err) {
+        loginMsg.textContent = err.message;
+        loginMsg.className = "msg err";
+      }
+    });
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      registerMsg.textContent = "";
+      registerMsg.className = "msg";
+      try {
+        await studypro.api("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            name: document.getElementById("registerName").value.trim(),
+            email: document.getElementById("registerEmail").value.trim(),
+            password: document.getElementById("registerPassword").value
+          })
+        });
+        window.location.href = "/dashboard.html";
+      } catch (err) {
+        registerMsg.textContent = err.message;
+        registerMsg.className = "msg err";
+      }
+    });
+  </script>
 </body>
 </html>

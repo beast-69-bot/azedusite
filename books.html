@@ -38,13 +38,8 @@
       <div class="container">
         <h2 class="section-title">Books & Notes</h2>
         <p class="section-sub">UI-only download/view actions for this front-end structure.</p>
-        <div class="grid grid-3">
-          <article class="card reveal"><h3>Physics Notes</h3><p>Concept summaries, solved examples, and practice-ready insights.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
-          <article class="card reveal"><h3>Chemistry Notes</h3><p>Physical, organic, and inorganic content with quick reference points.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
-          <article class="card reveal"><h3>Biology Notes</h3><p>Chapter-wise essentials, diagrams, and memory-focused revision content.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
-          <article class="card reveal"><h3>Mathematics Notes</h3><p>Approach-first notes with important formulas and shortcut methods.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
-          <article class="card reveal"><h3>Formula Sheets</h3><p>Condensed formulas for rapid final-day and weekly revision.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
-          <article class="card reveal"><h3>NCERT Quick Revision</h3><p>Fast NCERT recap sheets aligned to common exam question patterns.</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>
+        <div class="grid grid-3" id="booksGrid">
+          <article class="card reveal"><h3>Loading notes...</h3><p>Please wait.</p></article>
         </div>
       </div>
     </section>
@@ -58,8 +53,20 @@
     const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("visible")}),{threshold:.14});
     document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
     document.getElementById("year").textContent=new Date().getFullYear();
+    async function loadBooks(){
+      const grid=document.getElementById("booksGrid");
+      try{
+        const data=await studypro.api("/api/content/books");
+        if(!data.rows.length){grid.innerHTML='<article class="card reveal"><h3>No published books yet</h3><p>Admin will publish books soon.</p></article>';return;}
+        grid.innerHTML=data.rows.map(row=>`<article class="card reveal"><h3>${row.title}</h3><p>${row.description}</p><div class="actions"><button class="btn btn-outline" type="button">View</button><button class="btn btn-primary" type="button">Download</button></div></article>`).join("");
+        document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+      }catch(_){
+        grid.innerHTML='<article class="card reveal"><h3>Unable to load books</h3><p>Try refreshing the page.</p></article>';
+      }
+    }
     studypro.ensureAuthLinks();
     studypro.lockSection("books");
+    loadBooks();
   </script>
 </body>
 </html>

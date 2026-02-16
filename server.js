@@ -16,11 +16,53 @@ const PLANS = {
   monthly: { label: "Monthly", amount: 99, days: 30 }
 };
 
-function loadDb() {
-  if (!fs.existsSync(DB_FILE)) {
-    return { users: [], payments: [], subscriptions: [], counters: { users: 0, payments: 0, subscriptions: 0 } };
+const CONTENT_SECTIONS = ["courses", "books", "pyqs", "mock"];
+
+function defaultDb() {
+  return {
+    users: [],
+    payments: [],
+    subscriptions: [],
+    content: {
+      courses: [],
+      books: [],
+      pyqs: [],
+      mock: []
+    },
+    counters: {
+      users: 0,
+      payments: 0,
+      subscriptions: 0,
+      content: { courses: 0, books: 0, pyqs: 0, mock: 0 }
+    }
+  };
+}
+
+function ensureDbShape(raw) {
+  const base = defaultDb();
+  const db = { ...base, ...raw };
+  db.users = Array.isArray(db.users) ? db.users : [];
+  db.payments = Array.isArray(db.payments) ? db.payments : [];
+  db.subscriptions = Array.isArray(db.subscriptions) ? db.subscriptions : [];
+  db.content = typeof db.content === "object" && db.content ? db.content : {};
+  db.counters = typeof db.counters === "object" && db.counters ? db.counters : {};
+  db.counters.content = typeof db.counters.content === "object" && db.counters.content ? db.counters.content : {};
+
+  for (const section of CONTENT_SECTIONS) {
+    db.content[section] = Array.isArray(db.content[section]) ? db.content[section] : [];
+    db.counters.content[section] = Number(db.counters.content[section] || 0);
   }
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+
+  db.counters.users = Number(db.counters.users || 0);
+  db.counters.payments = Number(db.counters.payments || 0);
+  db.counters.subscriptions = Number(db.counters.subscriptions || 0);
+  return db;
+}
+
+function loadDb() {
+  if (!fs.existsSync(DB_FILE)) return defaultDb();
+  const raw = JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
+  return ensureDbShape(raw);
 }
 
 function saveDb(db) {
@@ -28,6 +70,80 @@ function saveDb(db) {
 }
 
 let db = loadDb();
+
+function seedContentIfEmpty() {
+  if (!db.content.courses.length) {
+    db.counters.content.courses += 1;
+    db.content.courses.push({
+      id: db.counters.content.courses,
+      title: "Course batches launching soon",
+      description: "Free batches of institutes coming soon.",
+      meta: "JEE & NEET",
+      status: "published",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  if (!db.content.books.length) {
+    const defaults = [
+      ["Physics Notes", "Concept summaries and solved examples."],
+      ["Chemistry Notes", "Physical, organic and inorganic quick revision."],
+      ["Biology Notes", "Chapter-wise essentials and diagrams."]
+    ];
+    defaults.forEach(([title, description]) => {
+      db.counters.content.books += 1;
+      db.content.books.push({
+        id: db.counters.content.books,
+        title,
+        description,
+        meta: "Download / View",
+        status: "published",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    });
+  }
+
+  if (!db.content.pyqs.length) {
+    const defaults = [
+      ["JEE Main PYQs", "Year-wise + Topic-wise", "Questions grouped by year and subject"],
+      ["JEE Advanced PYQs", "Advanced pattern sets", "High-level previous year question sets"],
+      ["NEET PYQs", "Year-wise collection", "Medical entrance PYQ practice library"]
+    ];
+    defaults.forEach(([title, meta, description]) => {
+      db.counters.content.pyqs += 1;
+      db.content.pyqs.push({
+        id: db.counters.content.pyqs,
+        title,
+        meta,
+        description,
+        status: "published",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    });
+  }
+
+  if (!db.content.mock.length) {
+    const defaults = [
+      ["JEE Main Full-Length", "Questions: 90 | Duration: 180 mins", "Repeated PYQ pattern simulation"],
+      ["NEET Full-Length", "Questions: 200 | Duration: 200 mins", "Repeated PYQ pattern simulation"]
+    ];
+    defaults.forEach(([title, meta, description]) => {
+      db.counters.content.mock += 1;
+      db.content.mock.push({
+        id: db.counters.content.mock,
+        title,
+        meta,
+        description,
+        status: "published",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    });
+  }
+}
 
 async function seedAdmin() {
   const adminEmail = (process.env.ADMIN_EMAIL || "admin@studypro.local").toLowerCase();
@@ -44,7 +160,6 @@ async function seedAdmin() {
     role: "admin",
     created_at: new Date().toISOString()
   });
-  saveDb(db);
 }
 
 app.use(express.json());
@@ -69,9 +184,11 @@ function adminRequired(req, res, next) {
 
 function getActiveSubscription(userId) {
   const now = Date.now();
-  return db.subscriptions
-    .filter((s) => s.user_id === userId && s.status === "active" && new Date(s.ends_at).getTime() > now)
-    .sort((a, b) => new Date(b.ends_at) - new Date(a.ends_at))[0] || null;
+  return (
+    db.subscriptions
+      .filter((s) => s.user_id === userId && s.status === "active" && new Date(s.ends_at).getTime() > now)
+      .sort((a, b) => new Date(b.ends_at) - new Date(a.ends_at))[0] || null
+  );
 }
 
 function issueToken(res, user) {
@@ -81,8 +198,29 @@ function issueToken(res, user) {
   return payload;
 }
 
+function normalizeSection(value) {
+  const section = String(value || "").toLowerCase().trim();
+  return CONTENT_SECTIONS.includes(section) ? section : null;
+}
+
+function sanitizeContentPayload(body) {
+  return {
+    title: String(body.title || "").trim(),
+    description: String(body.description || "").trim(),
+    meta: String(body.meta || "").trim(),
+    status: body.status === "draft" ? "draft" : "published"
+  };
+}
+
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "studypro-api" }));
 app.get("/api/plans", (req, res) => res.json({ ok: true, plans: PLANS }));
+
+app.get("/api/content/:section", (req, res) => {
+  const section = normalizeSection(req.params.section);
+  if (!section) return res.status(400).json({ ok: false, message: "Invalid section" });
+  const rows = db.content[section].filter((x) => x.status === "published").sort((a, b) => b.id - a.id);
+  return res.json({ ok: true, section, rows });
+});
 
 app.post("/api/auth/register", async (req, res) => {
   try {
@@ -127,8 +265,9 @@ app.get("/api/auth/me", authRequired, (req, res) => {
 });
 
 app.get("/api/access/:section", authRequired, (req, res) => {
+  const section = normalizeSection(req.params.section) || req.params.section;
   const subscription = getActiveSubscription(req.user.id);
-  res.json({ ok: true, section: req.params.section, allowed: Boolean(subscription), subscription });
+  res.json({ ok: true, section, allowed: Boolean(subscription), subscription });
 });
 
 app.post("/api/payments/confirm", authRequired, (req, res) => {
@@ -168,14 +307,11 @@ app.post("/api/payments/confirm", authRequired, (req, res) => {
     created_at: now.toISOString()
   });
   saveDb(db);
-
   return res.json({ ok: true, paymentRef, subscription: getActiveSubscription(req.user.id) });
 });
 
 app.get("/api/payments/history", authRequired, (req, res) => {
-  const payments = db.payments
-    .filter((p) => p.user_id === req.user.id)
-    .sort((a, b) => b.id - a.id);
+  const payments = db.payments.filter((p) => p.user_id === req.user.id).sort((a, b) => b.id - a.id);
   res.json({ ok: true, payments });
 });
 
@@ -188,15 +324,17 @@ app.get("/api/admin/overview", authRequired, adminRequired, (req, res) => {
       users: db.users.length,
       payments: db.payments.length,
       revenue,
-      activeSubscriptions
+      activeSubscriptions,
+      courses: db.content.courses.length,
+      books: db.content.books.length,
+      pyqs: db.content.pyqs.length,
+      mock: db.content.mock.length
     }
   });
 });
 
 app.get("/api/admin/users", authRequired, adminRequired, (req, res) => {
-  const rows = db.users
-    .map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, created_at: u.created_at }))
-    .sort((a, b) => b.id - a.id);
+  const rows = db.users.map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, created_at: u.created_at })).sort((a, b) => b.id - a.id);
   res.json({ ok: true, rows });
 });
 
@@ -211,10 +349,71 @@ app.get("/api/admin/payments", authRequired, adminRequired, (req, res) => {
   res.json({ ok: true, rows });
 });
 
+app.get("/api/admin/content/:section", authRequired, adminRequired, (req, res) => {
+  const section = normalizeSection(req.params.section);
+  if (!section) return res.status(400).json({ ok: false, message: "Invalid section" });
+  const rows = db.content[section].slice().sort((a, b) => b.id - a.id);
+  res.json({ ok: true, section, rows });
+});
+
+app.post("/api/admin/content/:section", authRequired, adminRequired, (req, res) => {
+  const section = normalizeSection(req.params.section);
+  if (!section) return res.status(400).json({ ok: false, message: "Invalid section" });
+  const payload = sanitizeContentPayload(req.body || {});
+  if (!payload.title || !payload.description) {
+    return res.status(400).json({ ok: false, message: "Title and description are required" });
+  }
+  db.counters.content[section] += 1;
+  const row = {
+    id: db.counters.content[section],
+    ...payload,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  db.content[section].push(row);
+  saveDb(db);
+  res.json({ ok: true, row });
+});
+
+app.put("/api/admin/content/:section/:id", authRequired, adminRequired, (req, res) => {
+  const section = normalizeSection(req.params.section);
+  if (!section) return res.status(400).json({ ok: false, message: "Invalid section" });
+  const id = Number(req.params.id);
+  const idx = db.content[section].findIndex((x) => x.id === id);
+  if (idx === -1) return res.status(404).json({ ok: false, message: "Item not found" });
+
+  const payload = sanitizeContentPayload(req.body || {});
+  if (!payload.title || !payload.description) {
+    return res.status(400).json({ ok: false, message: "Title and description are required" });
+  }
+  db.content[section][idx] = {
+    ...db.content[section][idx],
+    ...payload,
+    updated_at: new Date().toISOString()
+  };
+  saveDb(db);
+  res.json({ ok: true, row: db.content[section][idx] });
+});
+
+app.delete("/api/admin/content/:section/:id", authRequired, adminRequired, (req, res) => {
+  const section = normalizeSection(req.params.section);
+  if (!section) return res.status(400).json({ ok: false, message: "Invalid section" });
+  const id = Number(req.params.id);
+  const idx = db.content[section].findIndex((x) => x.id === id);
+  if (idx === -1) return res.status(404).json({ ok: false, message: "Item not found" });
+  db.content[section].splice(idx, 1);
+  saveDb(db);
+  res.json({ ok: true });
+});
+
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
-seedAdmin().then(() => {
-  app.listen(PORT, () => {
-    console.log(`StudyPro running on http://localhost:${PORT}`);
+Promise.resolve()
+  .then(seedAdmin)
+  .then(() => {
+    seedContentIfEmpty();
+    saveDb(db);
+    app.listen(PORT, () => {
+      console.log(`StudyPro running on http://localhost:${PORT}`);
+    });
   });
-});

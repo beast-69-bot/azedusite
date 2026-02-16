@@ -72,16 +72,12 @@
     <section>
       <div class="container">
         <h2 class="section-title">JEE Main Mock Tests</h2>
-        <div class="grid grid-2" style="margin-bottom:22px;">
-          <article class="card mock-card"><span class="chip">JEE Main Full-Length</span><span class="lock-tag">Locked</span><h3>JEE Main Repeated PYQ Pattern Simulation</h3><p>Questions: 90 | Duration: 180 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card"><span class="chip">JEE Main Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated JEE Main Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card"><span class="chip">JEE Main</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional JEE Main sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+        <div class="grid grid-2" style="margin-bottom:22px;" id="jeeMockGrid">
+          <article class="card mock-card"><span class="chip">Loading</span><span class="lock-tag">Locked</span><h3>Loading JEE mocks...</h3><p>Please wait.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
         </div>
         <h2 class="section-title">NEET Mock Tests</h2>
-        <div class="grid grid-2">
-          <article class="card mock-card"><span class="chip">NEET Full-Length</span><span class="lock-tag">Locked</span><h3>NEET Repeated PYQ Pattern Simulation</h3><p>Questions: 200 | Duration: 200 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card"><span class="chip">NEET Topic-wise</span><span class="lock-tag">Locked</span><h3>Most Repeated NEET Topic Clusters</h3><p>Questions: 45 | Duration: 60 mins</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
-          <article class="card mock-card"><span class="chip">NEET</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional NEET sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
+        <div class="grid grid-2" id="neetMockGrid">
+          <article class="card mock-card"><span class="chip">Loading</span><span class="lock-tag">Locked</span><h3>Loading NEET mocks...</h3><p>Please wait.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>
         </div>
       </div>
     </section>
@@ -96,6 +92,23 @@
     menuToggle.addEventListener("click", () => navLinks.classList.toggle("open"));
     navLinks.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => navLinks.classList.remove("open")));
     const accessStatus = document.getElementById("accessStatus");
+
+    async function loadMockContent(){
+      const jeeGrid=document.getElementById("jeeMockGrid");
+      const neetGrid=document.getElementById("neetMockGrid");
+      try{
+        const data=await studypro.api("/api/content/mock");
+        const rows=data.rows||[];
+        const jeeRows=rows.filter(r=>(`${r.title} ${r.meta} ${r.description}`).toLowerCase().includes("jee"));
+        const neetRows=rows.filter(r=>(`${r.title} ${r.meta} ${r.description}`).toLowerCase().includes("neet"));
+        const mapRow=(row)=>`<article class="card mock-card"><span class="chip">${row.title}</span><span class="lock-tag">Locked</span><h3>${row.meta || "Mock Test"}</h3><p>${row.description}</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>`;
+        jeeGrid.innerHTML=(jeeRows.length?jeeRows.map(mapRow).join(""):'<article class="card mock-card"><span class="chip">JEE Main</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional JEE Main sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>');
+        neetGrid.innerHTML=(neetRows.length?neetRows.map(mapRow).join(""):'<article class="card mock-card"><span class="chip">NEET</span><span class="lock-tag">Locked</span><h3>More tests coming soon</h3><p>Additional NEET sets will be added shortly.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>');
+      }catch(_){
+        jeeGrid.innerHTML='<article class="card mock-card"><span class="chip">Error</span><span class="lock-tag">Locked</span><h3>Unable to load JEE mock content</h3><p>Try refreshing the page.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>';
+        neetGrid.innerHTML='<article class="card mock-card"><span class="chip">Error</span><span class="lock-tag">Locked</span><h3>Unable to load NEET mock content</h3><p>Try refreshing the page.</p><div class="actions"><button class="btn btn-muted start-btn">Locked</button></div></article>';
+      }
+    }
 
     async function applyServerAccess() {
       try {
@@ -124,22 +137,24 @@
       }
     }
 
-    document.querySelectorAll(".start-btn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        try {
-          const r = await studypro.api("/api/access/mock");
-          if (!r.allowed) return window.location.href = "/dashboard.html";
-          alert("Test launch is UI-only in this build.");
-        } catch (_) {
-          window.location.href = "/login.html";
-        }
-      });
-    });
-
     document.getElementById("year").textContent = new Date().getFullYear();
     studypro.ensureAuthLinks();
     studypro.lockSection("mock");
-    applyServerAccess();
+    (async()=>{await loadMockContent(); await applyServerAccess();
+      document.querySelectorAll(".start-btn").forEach((btn)=>{
+        if(btn.dataset.bound)return;
+        btn.dataset.bound="1";
+        btn.addEventListener("click", async () => {
+          try {
+            const r = await studypro.api("/api/access/mock");
+            if (!r.allowed) return window.location.href = "/dashboard.html";
+            alert("Test launch is UI-only in this build.");
+          } catch (_) {
+            window.location.href = "/login.html";
+          }
+        });
+      });
+    })();
   </script>
 </body>
 </html>

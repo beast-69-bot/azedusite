@@ -3,52 +3,238 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StudyPro Academy | Admin</title>
+  <title>StudyPro Academy | Admin CMS</title>
   <style>
     body{margin:0;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#f4f7fb;color:#142033}
-    .container{width:min(1120px,92%);margin:0 auto}.nav{background:#fff;border-bottom:1px solid #e4ebf5}
-    .nav .inner{min-height:64px;display:flex;align-items:center;justify-content:space-between}
+    .container{width:min(1180px,92%);margin:0 auto}
+    .nav{background:#fff;border-bottom:1px solid #e4ebf5}
+    .inner{min-height:66px;display:flex;align-items:center;justify-content:space-between}
     .links a{text-decoration:none;color:#1e2c41;margin-left:12px;font-weight:600}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:1fr 1fr}
     .card{background:#fff;border:1px solid #e4ebf5;border-radius:16px;padding:18px;box-shadow:0 14px 28px rgba(15,31,58,.08);margin:16px 0}
-    table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e4ebf5;text-align:left}
+    h2,h3{margin:0 0 10px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+    .tab{border:1px solid #d6e3f7;background:#fff;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .tab.active{background:#e9f1ff;color:#0f5bd8;border-color:#bdd6ff}
+    label{display:block;font-size:.85rem;font-weight:700;margin:7px 0 4px}
+    input,textarea,select{width:100%;border:1px solid #d9e4f6;border-radius:10px;padding:10px 12px;font:inherit}
+    textarea{min-height:90px;resize:vertical}
+    .btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn-primary{background:#0f5bd8;color:#fff}.btn-muted{background:#eef3fb;color:#274364}.btn-danger{background:#ffe4e4;color:#8e1f1f}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #e5edf8;text-align:left;vertical-align:top}
     .muted{color:#5d6b82}
+    .pill{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
+    .published{background:#e8fff1;color:#166534}.draft{background:#fff5d6;color:#8a6400}
+    @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="nav"><div class="container inner"><strong>StudyPro Admin</strong><div class="links"><a href="/dashboard.html">Dashboard</a><a href="#" id="logoutBtn">Logout</a></div></div></div>
+  <header class="nav">
+    <div class="container inner">
+      <strong>StudyPro Admin CMS</strong>
+      <div class="links">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/index.html">Website</a>
+        <a href="#" id="logoutBtn">Logout</a>
+      </div>
+    </div>
+  </header>
+
   <div class="container">
-    <div class="card"><h2 style="margin:0 0 8px;">Admin Overview</h2><p id="stats" class="muted">Loading...</p></div>
-    <div class="card"><h3>Users</h3><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead><tbody id="usersBody"></tbody></table></div>
-    <div class="card"><h3>Payments</h3><table><thead><tr><th>ID</th><th>User</th><th>Email</th><th>Plan</th><th>Amount</th><th>Ref</th><th>Status</th><th>Paid At</th></tr></thead><tbody id="paymentsBody"></tbody></table></div>
+    <section class="card">
+      <h2>Admin Overview</h2>
+      <p id="stats" class="muted">Loading...</p>
+    </section>
+
+    <section class="card">
+      <h2>Content Manager</h2>
+      <div class="tabs">
+        <button class="tab active" data-section="courses">Courses</button>
+        <button class="tab" data-section="books">Books</button>
+        <button class="tab" data-section="pyqs">PYQs</button>
+        <button class="tab" data-section="mock">Mock Tests</button>
+      </div>
+
+      <div class="grid grid-2">
+        <form id="contentForm">
+          <h3 id="formTitle">Add Courses Item</h3>
+          <input type="hidden" id="itemId" />
+          <label>Title</label>
+          <input id="title" required />
+          <label>Description</label>
+          <textarea id="description" required></textarea>
+          <label>Meta (optional)</label>
+          <input id="meta" placeholder="e.g. Questions: 90 | Duration: 180 mins" />
+          <label>Status</label>
+          <select id="status">
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn btn-primary" type="submit" id="saveBtn">Create Item</button>
+            <button class="btn btn-muted" type="button" id="resetBtn">Reset</button>
+          </div>
+          <p id="formMsg" class="muted"></p>
+        </form>
+
+        <div>
+          <h3 id="listTitle">Courses Items</h3>
+          <table>
+            <thead><tr><th>Title</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="contentRows"><tr><td colspan="3" class="muted">No items</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Users</h3>
+      <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th></tr></thead><tbody id="usersBody"></tbody></table>
+    </section>
+
+    <section class="card">
+      <h3>Payments</h3>
+      <table><thead><tr><th>ID</th><th>User</th><th>Email</th><th>Plan</th><th>Amount</th><th>Ref</th><th>Status</th><th>Paid At</th></tr></thead><tbody id="paymentsBody"></tbody></table>
+    </section>
   </div>
+
   <script src="/assets/app.js"></script>
   <script>
     const stats = document.getElementById("stats");
     const usersBody = document.getElementById("usersBody");
     const paymentsBody = document.getElementById("paymentsBody");
+    const contentRows = document.getElementById("contentRows");
+    const form = document.getElementById("contentForm");
+    const formMsg = document.getElementById("formMsg");
+    const itemId = document.getElementById("itemId");
+    const title = document.getElementById("title");
+    const description = document.getElementById("description");
+    const meta = document.getElementById("meta");
+    const statusEl = document.getElementById("status");
+    const formTitle = document.getElementById("formTitle");
+    const listTitle = document.getElementById("listTitle");
+    const saveBtn = document.getElementById("saveBtn");
+    let activeSection = "courses";
 
-    async function init() {
-      try {
-        const me = await studypro.api("/api/auth/me");
-        if (me.user.role !== "admin") return window.location.href = "/dashboard.html";
-        const ov = await studypro.api("/api/admin/overview");
-        stats.textContent = `Users: ${ov.stats.users} | Payments: ${ov.stats.payments} | Revenue: Rs ${ov.stats.revenue} | Active Subs: ${ov.stats.activeSubscriptions}`;
-        const users = await studypro.api("/api/admin/users");
-        users.rows.forEach((u) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${new Date(u.created_at).toLocaleString()}</td>`;
-          usersBody.appendChild(tr);
-        });
-        const payments = await studypro.api("/api/admin/payments");
-        payments.rows.forEach((p) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${p.id}</td><td>${p.name}</td><td>${p.email}</td><td>${p.plan_key}</td><td>Rs ${p.amount}</td><td>${p.payment_ref}</td><td>${p.status}</td><td>${new Date(p.paid_at).toLocaleString()}</td>`;
-          paymentsBody.appendChild(tr);
-        });
-      } catch (_) {
-        window.location.href = "/login.html";
-      }
+    function capitalize(x) { return x.charAt(0).toUpperCase() + x.slice(1); }
+
+    function resetForm() {
+      itemId.value = "";
+      title.value = "";
+      description.value = "";
+      meta.value = "";
+      statusEl.value = "published";
+      formTitle.textContent = `Add ${capitalize(activeSection)} Item`;
+      saveBtn.textContent = "Create Item";
+      formMsg.textContent = "";
     }
+
+    async function loadContent() {
+      const data = await studypro.api(`/api/admin/content/${activeSection}`);
+      listTitle.textContent = `${capitalize(activeSection)} Items`;
+      if (!data.rows.length) {
+        contentRows.innerHTML = `<tr><td colspan="3" class="muted">No items in ${activeSection}</td></tr>`;
+        return;
+      }
+      contentRows.innerHTML = "";
+      data.rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${row.title}</strong><br><span class="muted">${row.meta || ""}</span></td>
+          <td><span class="pill ${row.status === "published" ? "published" : "draft"}">${row.status}</span></td>
+          <td>
+            <div class="row">
+              <button class="btn btn-muted" data-action="edit" data-id="${row.id}">Edit</button>
+              <button class="btn btn-danger" data-action="delete" data-id="${row.id}">Delete</button>
+            </div>
+          </td>`;
+        tr.dataset.full = JSON.stringify(row);
+        contentRows.appendChild(tr);
+      });
+    }
+
+    async function loadBaseData() {
+      const me = await studypro.api("/api/auth/me");
+      if (me.user.role !== "admin") {
+        window.location.href = "/dashboard.html";
+        return;
+      }
+      const ov = await studypro.api("/api/admin/overview");
+      stats.textContent = `Users: ${ov.stats.users} | Payments: ${ov.stats.payments} | Revenue: Rs ${ov.stats.revenue} | Active Subs: ${ov.stats.activeSubscriptions} | Content -> Courses: ${ov.stats.courses}, Books: ${ov.stats.books}, PYQs: ${ov.stats.pyqs}, Mock: ${ov.stats.mock}`;
+
+      const users = await studypro.api("/api/admin/users");
+      usersBody.innerHTML = users.rows.map((u) => `<tr><td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td>${new Date(u.created_at).toLocaleString()}</td></tr>`).join("");
+
+      const payments = await studypro.api("/api/admin/payments");
+      paymentsBody.innerHTML = payments.rows.map((p) => `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.email}</td><td>${p.plan_key}</td><td>Rs ${p.amount}</td><td>${p.payment_ref}</td><td>${p.status}</td><td>${new Date(p.paid_at).toLocaleString()}</td></tr>`).join("");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      formMsg.textContent = "";
+      const payload = {
+        title: title.value.trim(),
+        description: description.value.trim(),
+        meta: meta.value.trim(),
+        status: statusEl.value
+      };
+      try {
+        if (itemId.value) {
+          await studypro.api(`/api/admin/content/${activeSection}/${itemId.value}`, {
+            method: "PUT",
+            body: JSON.stringify(payload)
+          });
+          formMsg.textContent = "Item updated.";
+        } else {
+          await studypro.api(`/api/admin/content/${activeSection}`, {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+          formMsg.textContent = "Item created.";
+        }
+        resetForm();
+        await loadContent();
+      } catch (err) {
+        formMsg.textContent = err.message;
+      }
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", resetForm);
+
+    contentRows.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const tr = btn.closest("tr");
+      const row = JSON.parse(tr.dataset.full || "{}");
+      if (btn.dataset.action === "edit") {
+        itemId.value = row.id;
+        title.value = row.title || "";
+        description.value = row.description || "";
+        meta.value = row.meta || "";
+        statusEl.value = row.status || "published";
+        formTitle.textContent = `Edit ${capitalize(activeSection)} Item`;
+        saveBtn.textContent = "Update Item";
+        return;
+      }
+      if (btn.dataset.action === "delete") {
+        if (!confirm("Delete this item?")) return;
+        await studypro.api(`/api/admin/content/${activeSection}/${row.id}`, { method: "DELETE" });
+        await loadContent();
+      }
+    });
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", async () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeSection = tab.dataset.section;
+        resetForm();
+        await loadContent();
+      });
+    });
 
     document.getElementById("logoutBtn").addEventListener("click", async (e) => {
       e.preventDefault();
@@ -56,7 +242,15 @@
       window.location.href = "/login.html";
     });
 
-    init();
+    (async function init() {
+      try {
+        await loadBaseData();
+        resetForm();
+        await loadContent();
+      } catch (_) {
+        window.location.href = "/login.html";
+      }
+    })();
   </script>
 </body>
 </html>

@@ -50,11 +50,8 @@
             <button class="filter-btn" type="button">Biology</button>
           </div>
         </div>
-        <div class="grid grid-2">
-          <article class="card reveal"><span class="chip">JEE Main PYQs</span><h3>Year-wise + Topic-wise</h3><p>Organized sets for chapter-level and annual exam preparation.</p><div class="actions"><button class="btn btn-outline">View</button><button class="btn btn-primary">Download</button></div></article>
-          <article class="card reveal"><span class="chip">JEE Advanced PYQs</span><h3>Advanced Pattern Sets</h3><p>Multi-concept problems sorted by year and concept difficulty.</p><div class="actions"><button class="btn btn-outline">View</button><button class="btn btn-primary">Download</button></div></article>
-          <article class="card reveal"><span class="chip">NEET PYQs</span><h3>Year-wise Collections</h3><p>Medical entrance PYQs organized for exam-style practice.</p><div class="actions"><button class="btn btn-outline">View</button><button class="btn btn-primary">Download</button></div></article>
-          <article class="card reveal"><span class="chip">Topic Filters</span><h3>Practice by Subject</h3><p>Use subject and chapter filters for targeted PYQ revision.</p><div class="actions"><button class="btn btn-outline">Apply Filter</button></div></article>
+        <div class="grid grid-2" id="pyqGrid">
+          <article class="card reveal"><span class="chip">Loading</span><h3>Loading PYQs...</h3><p>Please wait.</p></article>
         </div>
       </div>
     </section>
@@ -69,8 +66,20 @@
     document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
     document.querySelectorAll(".filter-btn").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}));
     document.getElementById("year").textContent=new Date().getFullYear();
+    async function loadPyqs(){
+      const grid=document.getElementById("pyqGrid");
+      try{
+        const data=await studypro.api("/api/content/pyqs");
+        if(!data.rows.length){grid.innerHTML='<article class="card reveal"><span class="chip">Coming Soon</span><h3>No published PYQ sets yet</h3><p>Admin will publish PYQs soon.</p></article>';return;}
+        grid.innerHTML=data.rows.map(row=>`<article class="card reveal"><span class="chip">${row.title}</span><h3>${row.meta || ""}</h3><p>${row.description}</p><div class="actions"><button class="btn btn-outline">View</button><button class="btn btn-primary">Download</button></div></article>`).join("");
+        document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+      }catch(_){
+        grid.innerHTML='<article class="card reveal"><span class="chip">Error</span><h3>Unable to load PYQs</h3><p>Try refreshing the page.</p></article>';
+      }
+    }
     studypro.ensureAuthLinks();
     studypro.lockSection("pyqs");
+    loadPyqs();
   </script>
 </body>
 </html>

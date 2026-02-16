@@ -37,8 +37,8 @@
       <div class="container">
         <h2 class="section-title">Courses</h2>
         <p class="section-sub">Each plan includes digital learning access with guided preparation. Free batches of institutes coming soon.</p>
-        <div class="grid grid-2">
-          <article class="card reveal"><span class="chip">Coming Soon</span><h3>Course Batches Launching Soon</h3><p>Free batches of institutes coming soon.</p><p>New structured course options will be published here shortly.</p></article>
+        <div class="grid grid-2" id="coursesGrid">
+          <article class="card reveal"><span class="chip">Loading</span><h3>Loading courses...</h3><p>Please wait.</p></article>
         </div>
       </div>
     </section>
@@ -52,8 +52,20 @@
     const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("visible")}),{threshold:.14});
     document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
     document.getElementById("year").textContent=new Date().getFullYear();
+    async function loadCourses(){
+      const grid=document.getElementById("coursesGrid");
+      try{
+        const data=await studypro.api("/api/content/courses");
+        if(!data.rows.length){grid.innerHTML='<article class="card reveal"><span class="chip">Coming Soon</span><h3>No published courses yet</h3><p>Admin will publish courses soon.</p></article>';return;}
+        grid.innerHTML=data.rows.map(row=>`<article class="card reveal"><span class="chip">${row.meta || "Course"}</span><h3>${row.title}</h3><p>${row.description}</p></article>`).join("");
+        document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+      }catch(_){
+        grid.innerHTML='<article class="card reveal"><span class="chip">Error</span><h3>Unable to load courses</h3><p>Try refreshing the page.</p></article>';
+      }
+    }
     studypro.ensureAuthLinks();
     studypro.lockSection("courses");
+    loadCourses();
   </script>
 </body>
 </html>

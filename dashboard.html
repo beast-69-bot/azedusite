@@ -8,10 +8,10 @@
     body{margin:0;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;background:#f4f7fb;color:#142033}
     .container{width:min(1120px,92%);margin:0 auto}
     .nav{background:#fff;border-bottom:1px solid #e4ebf5}
-    .nav .inner{min-height:64px;display:flex;align-items:center;justify-content:space-between}
+    .inner{min-height:64px;display:flex;align-items:center;justify-content:space-between}
     .links a{text-decoration:none;color:#1e2c41;margin-left:12px;font-weight:600}
     .hero{padding:30px 0}
-    .grid{display:grid;gap:16px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid{display:grid;gap:16px}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-2{grid-template-columns:1fr 1fr}
     .card{background:#fff;border:1px solid #e4ebf5;border-radius:16px;padding:18px;box-shadow:0 14px 28px rgba(15,31,58,.08)}
     .price{font-size:1.45rem;font-weight:800}
     button{border:none;background:#0f5bd8;color:#fff;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
@@ -19,7 +19,21 @@
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid #e4ebf5;text-align:left}
     .muted{color:#5d6b82}
-    @media (max-width:980px){.grid-3{grid-template-columns:1fr}}
+    .qr-box{
+      width:180px;height:180px;border-radius:12px;border:1px solid #d4e1f5;
+      background:
+        repeating-linear-gradient(0deg,#10243f 0 6px,#fff 6px 12px),
+        repeating-linear-gradient(90deg,#10243f 0 6px,#fff 6px 12px);
+      background-blend-mode:multiply;
+      margin:auto;
+    }
+    .steps{margin:8px 0 0 18px;padding:0}
+    .steps li{margin:4px 0}
+    .status{font-weight:700}
+    .status.pending{color:#a16207}
+    .status.approved{color:#166534}
+    .status.declined{color:#b91c1c}
+    @media (max-width:980px){.grid-3,.grid-2{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -45,22 +59,51 @@
   <div class="container">
     <h2>Single Subscription Plans (Valid for Courses + Books + PYQs + Mock Tests)</h2>
     <div class="grid grid-3" style="margin-bottom:18px;">
-      <div class="card"><h3>Daily Plan</h3><div class="price">₹9</div><p class="muted">Valid 1 day for all sections.</p><button data-plan="daily" class="payBtn">Pay ₹9</button></div>
-      <div class="card"><h3>7 Day Plan</h3><div class="price">₹29</div><p class="muted">Valid 7 days for all sections.</p><button data-plan="weekly" class="payBtn">Pay ₹29</button></div>
-      <div class="card"><h3>Monthly Plan</h3><div class="price">₹99</div><p class="muted">Valid 30 days for all sections.</p><button data-plan="monthly" class="payBtn">Pay ₹99</button></div>
+      <div class="card"><h3>Daily Plan</h3><div class="price">Rs 9</div><p class="muted">Valid 1 day for all sections.</p><button data-plan="daily" data-amount="9" class="payBtn">Choose Rs 9</button></div>
+      <div class="card"><h3>7 Day Plan</h3><div class="price">Rs 29</div><p class="muted">Valid 7 days for all sections.</p><button data-plan="weekly" data-amount="29" class="payBtn">Choose Rs 29</button></div>
+      <div class="card"><h3>Monthly Plan</h3><div class="price">Rs 99</div><p class="muted">Valid 30 days for all sections.</p><button data-plan="monthly" data-amount="99" class="payBtn">Choose Rs 99</button></div>
+    </div>
+
+    <div class="card" id="paymentSection" style="display:none;margin-bottom:16px;">
+      <h3>Payment Section</h3>
+      <p class="muted" id="selectedPlanText">Selected plan: -</p>
+      <div class="grid grid-2">
+        <div>
+          <h4 style="margin:0 0 8px;">Scan QR and Pay</h4>
+          <div class="qr-box"></div>
+          <p class="muted" style="margin-top:8px;">UPI ID: <strong>studyproacademy@upi</strong></p>
+        </div>
+        <div>
+          <h4 style="margin:0 0 8px;">Steps</h4>
+          <ol class="steps">
+            <li>Plan select karo (Rs 9 / Rs 29 / Rs 99).</li>
+            <li>QR scan karke exact amount pay karo.</li>
+            <li>Payment app me transaction UTR copy karo.</li>
+            <li>Niche UTR submit karo for admin approval.</li>
+          </ol>
+          <form id="utrForm" style="margin-top:10px;">
+            <input type="hidden" id="planKey" />
+            <label for="utrInput" style="display:block;font-weight:700;margin:8px 0 4px;">Enter UTR Number</label>
+            <input id="utrInput" required minlength="6" placeholder="e.g. 236541789021" style="width:100%;padding:10px;border:1px solid #dbe7f8;border-radius:10px;" />
+            <button type="submit" style="margin-top:10px;">Submit UTR</button>
+            <p id="utrMsg" class="muted"></p>
+          </form>
+        </div>
+      </div>
     </div>
 
     <div class="card">
       <h3>Payment History</h3>
       <table>
-        <thead><tr><th>Plan</th><th>Amount</th><th>Ref</th><th>Status</th><th>Paid At</th></tr></thead>
-        <tbody id="paymentBody"><tr><td colspan="5" class="muted">No payments yet</td></tr></tbody>
+        <thead><tr><th>Plan</th><th>Amount</th><th>UTR</th><th>Ref</th><th>Status</th><th>Submitted At</th></tr></thead>
+        <tbody id="paymentBody"><tr><td colspan="6" class="muted">No payments yet</td></tr></tbody>
       </table>
     </div>
 
     <div class="card" id="adminCard" style="display:none;margin-top:16px;">
       <h3>Admin Overview</h3>
       <p class="muted" id="adminStats">Loading...</p>
+      <p><a href="/admin.html">Open Admin CMS</a></p>
     </div>
   </div>
 
@@ -71,12 +114,22 @@
     const paymentBody = document.getElementById("paymentBody");
     const adminCard = document.getElementById("adminCard");
     const adminStats = document.getElementById("adminStats");
-    let currentUser = null;
+    const paymentSection = document.getElementById("paymentSection");
+    const selectedPlanText = document.getElementById("selectedPlanText");
+    const planKeyInput = document.getElementById("planKey");
+    const utrInput = document.getElementById("utrInput");
+    const utrMsg = document.getElementById("utrMsg");
+
+    function statusClass(s){
+      const x = String(s || "").toLowerCase();
+      if (x === "approved") return "approved";
+      if (x === "declined") return "declined";
+      return "pending";
+    }
 
     async function loadMe() {
       try {
         const data = await studypro.api("/api/auth/me");
-        currentUser = data.user;
         userLine.textContent = `${data.user.name} (${data.user.email})`;
         if (data.subscription) {
           subStatus.textContent = `Active: ${data.subscription.plan_key} until ${new Date(data.subscription.ends_at).toLocaleString()}`;
@@ -86,7 +139,7 @@
         if (data.user.role === "admin") {
           adminCard.style.display = "block";
           const ov = await studypro.api("/api/admin/overview");
-          adminStats.textContent = `Users: ${ov.stats.users} | Payments: ${ov.stats.payments} | Revenue: ₹${ov.stats.revenue} | Active Subs: ${ov.stats.activeSubscriptions}`;
+          adminStats.textContent = `Users: ${ov.stats.users} | Payments: ${ov.stats.payments} | Revenue: Rs ${ov.stats.revenue} | Active Subs: ${ov.stats.activeSubscriptions}`;
         }
       } catch (_) {
         window.location.href = "/login.html";
@@ -95,25 +148,46 @@
 
     async function loadPayments() {
       const data = await studypro.api("/api/payments/history");
-      if (!data.payments.length) return;
+      if (!data.payments.length) {
+        paymentBody.innerHTML = '<tr><td colspan="6" class="muted">No payments yet</td></tr>';
+        return;
+      }
       paymentBody.innerHTML = "";
       data.payments.forEach((p) => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${p.plan_key}</td><td>₹${p.amount}</td><td>${p.payment_ref}</td><td>${p.status}</td><td>${new Date(p.paid_at).toLocaleString()}</td>`;
+        tr.innerHTML = `<td>${p.plan_key}</td><td>Rs ${p.amount}</td><td>${p.utr || "-"}</td><td>${p.payment_ref}</td><td class="status ${statusClass(p.status)}">${p.status}</td><td>${new Date(p.paid_at).toLocaleString()}</td>`;
         paymentBody.appendChild(tr);
       });
     }
 
     document.querySelectorAll(".payBtn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        await studypro.api("/api/payments/confirm", {
-          method: "POST",
-          body: JSON.stringify({ planKey: btn.dataset.plan })
-        });
-        await loadMe();
-        await loadPayments();
-        alert("Payment recorded and subscription activated.");
+      btn.addEventListener("click", () => {
+        const plan = btn.dataset.plan;
+        const amount = btn.dataset.amount;
+        planKeyInput.value = plan;
+        selectedPlanText.textContent = `Selected plan: ${plan} (Rs ${amount})`;
+        paymentSection.style.display = "block";
+        paymentSection.scrollIntoView({ behavior: "smooth", block: "start" });
       });
+    });
+
+    document.getElementById("utrForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      utrMsg.textContent = "";
+      try {
+        await studypro.api("/api/payments/submit-utr", {
+          method: "POST",
+          body: JSON.stringify({
+            planKey: planKeyInput.value,
+            utr: utrInput.value.trim()
+          })
+        });
+        utrInput.value = "";
+        utrMsg.textContent = "UTR submitted. Wait for admin approval.";
+        await loadPayments();
+      } catch (err) {
+        utrMsg.textContent = err.message;
+      }
     });
 
     document.getElementById("logoutBtn").addEventListener("click", async (e) => {

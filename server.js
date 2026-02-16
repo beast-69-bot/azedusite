@@ -270,44 +270,32 @@ app.get("/api/access/:section", authRequired, (req, res) => {
   res.json({ ok: true, section, allowed: Boolean(subscription), subscription });
 });
 
-app.post("/api/payments/confirm", authRequired, (req, res) => {
-  const { planKey } = req.body;
+app.post("/api/payments/submit-utr", authRequired, (req, res) => {
+  const { planKey, utr } = req.body || {};
   const plan = PLANS[planKey];
   if (!plan) return res.status(400).json({ ok: false, message: "Invalid plan" });
-
-  const now = new Date();
-  const ends = new Date(now.getTime() + plan.days * 24 * 60 * 60 * 1000);
-  const paymentRef = `PAY-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const utrClean = String(utr || "").trim();
+  if (!/^[a-zA-Z0-9-]{6,40}$/.test(utrClean)) {
+    return res.status(400).json({ ok: false, message: "Invalid UTR format" });
+  }
 
   db.counters.payments += 1;
-  db.payments.push({
+  const now = new Date().toISOString();
+  const payment = {
     id: db.counters.payments,
     user_id: req.user.id,
     plan_key: planKey,
     amount: plan.amount,
-    payment_ref: paymentRef,
-    status: "success",
-    paid_at: now.toISOString(),
-    created_at: now.toISOString()
-  });
-
-  db.subscriptions.forEach((s) => {
-    if (s.user_id === req.user.id && s.status === "active") s.status = "expired";
-  });
-
-  db.counters.subscriptions += 1;
-  db.subscriptions.push({
-    id: db.counters.subscriptions,
-    user_id: req.user.id,
-    plan_key: planKey,
-    amount: plan.amount,
-    starts_at: now.toISOString(),
-    ends_at: ends.toISOString(),
-    status: "active",
-    created_at: now.toISOString()
-  });
+    payment_ref: `REQ-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    utr: utrClean,
+    status: "pending",
+    review_note: "",
+    paid_at: now,
+    created_at: now
+  };
+  db.payments.push(payment);
   saveDb(db);
-  return res.json({ ok: true, paymentRef, subscription: getActiveSubscription(req.user.id) });
+  return res.json({ ok: true, payment });
 });
 
 app.get("/api/payments/history", authRequired, (req, res) => {
@@ -317,7 +305,7 @@ app.get("/api/payments/history", authRequired, (req, res) => {
 
 app.get("/api/admin/overview", authRequired, adminRequired, (req, res) => {
   const activeSubscriptions = db.subscriptions.filter((s) => s.status === "active" && new Date(s.ends_at).getTime() > Date.now()).length;
-  const revenue = db.payments.filter((p) => p.status === "success").reduce((sum, p) => sum + p.amount, 0);
+  const revenue = db.payments.filter((p) => p.status === "approved" || p.status === "success").reduce((sum, p) => sum + p.amount, 0);
   res.json({
     ok: true,
     stats: {
@@ -347,6 +335,66 @@ app.get("/api/admin/payments", authRequired, adminRequired, (req, res) => {
     })
     .sort((a, b) => b.id - a.id);
   res.json({ ok: true, rows });
+});
+
+app.post("/api/admin/payments/:id/approve", authRequired, adminRequired, (req, res) => {
+  const id = Number(req.params.id);
+  const idx = db.payments.findIndex((p) => p.id === id);
+  if (idx === -1) return res.status(404).json({ ok: false, message: "Payment not found" });
+  const payment = db.payments[idx];
+  if (payment.status !== "pending") {
+    return res.status(400).json({ ok: false, message: "Only pending payments can be approved" });
+  }
+
+  const plan = PLANS[payment.plan_key];
+  if (!plan) return res.status(400).json({ ok: false, message: "Invalid plan in payment" });
+
+  db.payments[idx] = {
+    ...payment,
+    status: "approved",
+    reviewed_by: req.user.id,
+    reviewed_at: new Date().toISOString()
+  };
+
+  db.subscriptions.forEach((s) => {
+    if (s.user_id === payment.user_id && s.status === "active") s.status = "expired";
+  });
+
+  const now = new Date();
+  const ends = new Date(now.getTime() + plan.days * 24 * 60 * 60 * 1000);
+  db.counters.subscriptions += 1;
+  db.subscriptions.push({
+    id: db.counters.subscriptions,
+    user_id: payment.user_id,
+    plan_key: payment.plan_key,
+    amount: payment.amount,
+    starts_at: now.toISOString(),
+    ends_at: ends.toISOString(),
+    status: "active",
+    created_at: now.toISOString()
+  });
+
+  saveDb(db);
+  res.json({ ok: true });
+});
+
+app.post("/api/admin/payments/:id/decline", authRequired, adminRequired, (req, res) => {
+  const id = Number(req.params.id);
+  const idx = db.payments.findIndex((p) => p.id === id);
+  if (idx === -1) return res.status(404).json({ ok: false, message: "Payment not found" });
+  const payment = db.payments[idx];
+  if (payment.status !== "pending") {
+    return res.status(400).json({ ok: false, message: "Only pending payments can be declined" });
+  }
+  db.payments[idx] = {
+    ...payment,
+    status: "declined",
+    review_note: String((req.body || {}).reason || "").trim(),
+    reviewed_by: req.user.id,
+    reviewed_at: new Date().toISOString()
+  };
+  saveDb(db);
+  res.json({ ok: true });
 });
 
 app.get("/api/admin/content/:section", authRequired, adminRequired, (req, res) => {
